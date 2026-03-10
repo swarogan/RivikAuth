@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="import_export_title">Import / Eksport</string>
+    <string name="section_import">Import</string>
+    <string name="section_export">Eksport</string>
+    <string name="export_button">Eksportuj dane</string>
+    <string name="import_from">Importuj z %1$s</string>
+</resources>

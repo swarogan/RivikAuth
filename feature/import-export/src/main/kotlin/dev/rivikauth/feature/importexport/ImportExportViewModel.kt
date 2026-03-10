@@ -1,0 +1,175 @@
+package dev.rivikauth.feature.importexport
+
+import android.content.Context
+import android.net.Uri
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.rivikauth.core.database.dao.OtpEntryDao
+import dev.rivikauth.core.database.entity.OtpEntryEntity
+import dev.rivikauth.core.model.OtpEntry
+import dev.rivikauth.feature.importexport.exporter.VaultExporter
+import dev.rivikauth.feature.importexport.importer.AegisImporter
+import dev.rivikauth.feature.importexport.importer.AndOtpImporter
+import dev.rivikauth.feature.importexport.importer.BitwardenImporter
+import dev.rivikauth.feature.importexport.importer.GoogleAuthImporter
+import dev.rivikauth.feature.importexport.importer.Importer
+import dev.rivikauth.feature.importexport.importer.TwoFASImporter
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class ImportExportViewModel @Inject constructor(
+    private val otpEntryDao: OtpEntryDao,
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(ImportExportUiState())
+    val uiState: StateFlow<ImportExportUiState> = _uiState.asStateFlow()
+
+    private var pendingImporter: Importer? = null
+
+    val importers: List<Importer> = listOf(
+        AegisImporter(),
+        GoogleAuthImporter(),
+        TwoFASImporter(),
+        BitwardenImporter(),
+        AndOtpImporter(),
+    )
+
+    fun selectImporter(importer: Importer) {
+        pendingImporter = importer
+    }
+
+    fun importFromUri(context: Context, uri: Uri) {
+        val importer = pendingImporter ?: return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null, message = null) }
+            try {
+                val entries = context.contentResolver.openInputStream(uri)?.use { stream ->
+                    importer.parse(stream)
+                } ?: throw IllegalStateException("Nie udalo sie otworzyc pliku")
+
+                if (entries.isEmpty()) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "Plik nie zawiera wpisow do zaimportowania",
+                        )
+                    }
+                    return@launch
+                }
+
+                val entities = entries.map { it.toEntity() }
+                otpEntryDao.upsertAll(entities)
+
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        message = "Zaimportowano ${entries.size} wpisow z ${importer.name}",
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = "Blad importu (${importer.name}): ${e.message}",
+                    )
+                }
+            } finally {
+                pendingImporter = null
+            }
+        }
+    }
+
+    fun exportToUri(context: Context, uri: Uri) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null, message = null) }
+            try {
+                val entities = otpEntryDao.observeAll().first()
+                val entries = entities.map { it.toModel() }
+
+                if (entries.isEmpty()) {
+                    _uiState.update {
+                        it.copy(isLoading = false, error = "Brak wpisow do eksportu")
+                    }
+                    return@launch
+                }
+
+                val json = VaultExporter.exportPlaintext(entries)
+
+                context.contentResolver.openOutputStream(uri)?.use { stream ->
+                    stream.write(json.toByteArray(Charsets.UTF_8))
+                } ?: throw IllegalStateException("Nie udalo sie zapisac pliku")
+
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        message = "Wyeksportowano ${entries.size} wpisow",
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = "Blad eksportu: ${e.message}",
+                    )
+                }
+            }
+        }
+    }
+
+    fun clearMessage() {
+        _uiState.update { it.copy(message = null, error = null) }
+    }
+
+    private fun OtpEntry.toEntity(): OtpEntryEntity = OtpEntryEntity(
+        id = id,
+        name = name,
+        issuer = issuer,
+        type = type.name,
+        secret = secret,
+        algorithm = algorithm.name,
+        digits = digits,
+        period = period,
+        counter = counter,
+        pin = pin,
+        groupIds = groupIds.joinToString(","),
+        sortOrder = sortOrder,
+        note = note,
+        favorite = favorite,
+        iconData = iconData,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+    )
+
+    private fun OtpEntryEntity.toModel(): OtpEntry = OtpEntry(
+        id = id,
+        name = name,
+        issuer = issuer,
+        type = dev.rivikauth.core.model.OtpType.valueOf(type),
+        secret = secret,
+        algorithm = dev.rivikauth.core.model.HashAlgorithm.valueOf(algorithm),
+        digits = digits,
+        period = period,
+        counter = counter,
+        pin = pin,
+        groupIds = if (groupIds.isBlank()) emptySet() else groupIds.split(",").toSet(),
+        sortOrder = sortOrder,
+        note = note,
+        favorite = favorite,
+        iconData = iconData,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+    )
+}
+
+data class ImportExportUiState(
+    val isLoading: Boolean = false,
+    val message: String? = null,
+    val error: String? = null,
+)

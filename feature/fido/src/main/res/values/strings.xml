@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Passkey list -->
+    <string name="passkeys_title">Passkeys</string>
+    <string name="passkeys_empty_title">No passkeys</string>
+    <string name="passkeys_empty_subtitle">To create a passkey, select RivikAuthenticator as provider on a site or in an app that supports passkeys</string>
+    <string name="passkey_delete">Delete</string>
+    <string name="passkey_delete_title">Delete key?</string>
+    <string name="passkey_delete_message">The key for %1$s will be permanently deleted.</string>
+    <string name="passkey_cancel">Cancel</string>
+    <string name="passkey_created_at">Created: %1$s</string>
+    <string name="passkey_last_used">Last used: %1$s</string>
+    <string name="passkeys_scan_qr">Scan passkey QR</string>
+
+    <!-- Cable scan -->
+    <string name="cable_title">Passkey</string>
+    <string name="cable_back">Back</string>
+    <string name="cable_scanning_title">Starting\u2026</string>
+    <string name="cable_scanning_subtitle">Preparing caBLE session</string>
+    <string name="cable_connecting_title">Connecting to tunnel\u2026</string>
+    <string name="cable_connecting_subtitle">Establishing WebSocket connection</string>
+    <string name="cable_advertising_title">Waiting for connection\u2026</string>
+    <string name="cable_advertising_subtitle">BLE broadcasting</string>
+    <string name="cable_handshaking_title">Key agreement\u2026</string>
+    <string name="cable_handshaking_subtitle">Noise handshake in progress</string>
+    <string name="cable_processing_title">Processing\u2026</string>
+    <string name="cable_processing_subtitle">Creating or verifying passkey</string>
+    <string name="cable_success_title">Done!</string>
+    <string name="cable_success_subtitle">Passkey has been processed</string>
+    <string name="cable_error_title">Error</string>
+    <string name="cable_close">Close</string>
+    <string name="cable_retry">Try again</string>
+    <string name="cable_camera_permission_required">Camera permission required</string>
+    <string name="cable_grant_permission">Grant permission</string>
+    <string name="cable_scan_instruction">Scan the passkey QR code from your computer screen</string>
+    <string name="cable_bt_off_title">Bluetooth is off</string>
+    <string name="cable_bt_off_subtitle">Bluetooth is required for caBLE passkey communication with your computer</string>
+    <string name="cable_bt_enable">Open Bluetooth settings</string>
+</resources>

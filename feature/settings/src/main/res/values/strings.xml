@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Settings screen -->
+    <string name="settings_title">Settings</string>
+    <string name="section_security">Security</string>
+    <string name="setting_biometric">Biometrics</string>
+    <string name="setting_biometric_desc">Unlock vault with fingerprint</string>
+    <string name="setting_auto_lock">Auto-lock</string>
+    <string name="setting_auto_lock_desc">Lock when going to background</string>
+    <string name="setting_panic_wipe">Panic wipe</string>
+    <string name="setting_panic_wipe_desc">Erase data after 10 failed attempts</string>
+    <string name="section_appearance">Appearance</string>
+    <string name="setting_dark_theme">Dark theme</string>
+    <string name="setting_dark_theme_desc">Use dark theme</string>
+    <string name="setting_dynamic_colors">Dynamic Colors</string>
+    <string name="setting_dynamic_colors_desc">Colors matched to wallpaper</string>
+    <string name="section_bluetooth">Bluetooth</string>
+    <string name="setting_ble">BLE Authenticator</string>
+    <string name="setting_ble_desc">Act as FIDO2 roaming authenticator</string>
+    <string name="section_data">Data</string>
+    <string name="setting_import_export">Import / Export</string>
+    <string name="setting_import_export_desc">Import or export data</string>
+    <string name="section_language">Language</string>
+    <string name="setting_language">Language</string>
+    <string name="setting_language_desc">App display language</string>
+    <string name="language_english">English</string>
+    <string name="language_polish">Polish</string>
+
+    <!-- About screen -->
+    <string name="about_title">Info</string>
+    <string name="about_version">v1.0.0-dev</string>
+    <string name="about_description">2FA Authenticator with FIDO2/WebAuthn passkeys and caBLE v2 hybrid transport.</string>
+    <string name="about_author">by Adam /swarogan/ Sobociński</string>
+    <string name="about_website">vim.pl</string>
+    <string name="about_website_url">https://vim.pl</string>
+    <string name="about_github">github.com/swarogan</string>
+    <string name="about_github_url">https://github.com/swarogan</string>
+    <string name="about_x">x.com/swarogan</string>
+    <string name="about_x_url">https://x.com/swarogan</string>
+</resources>

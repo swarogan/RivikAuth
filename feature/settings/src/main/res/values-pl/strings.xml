@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Settings screen -->
+    <string name="settings_title">Ustawienia</string>
+    <string name="section_security">Bezpieczeństwo</string>
+    <string name="setting_biometric">Biometria</string>
+    <string name="setting_biometric_desc">Odblokuj vault odciskiem palca</string>
+    <string name="setting_auto_lock">Auto-lock</string>
+    <string name="setting_auto_lock_desc">Blokuj po przejściu do tła</string>
+    <string name="setting_panic_wipe">Panic wipe</string>
+    <string name="setting_panic_wipe_desc">Wymaż dane po 10 nieudanych próbach</string>
+    <string name="section_appearance">Wygląd</string>
+    <string name="setting_dark_theme">Ciemny motyw</string>
+    <string name="setting_dark_theme_desc">Użyj ciemnego motywu</string>
+    <string name="setting_dynamic_colors">Dynamic Colors</string>
+    <string name="setting_dynamic_colors_desc">Kolory dopasowane do tapety</string>
+    <string name="section_bluetooth">Bluetooth</string>
+    <string name="setting_ble">BLE Authenticator</string>
+    <string name="setting_ble_desc">Działaj jako FIDO2 roaming authenticator</string>
+    <string name="section_data">Dane</string>
+    <string name="setting_import_export">Import / Eksport</string>
+    <string name="setting_import_export_desc">Importuj lub eksportuj dane</string>
+    <string name="section_language">Język</string>
+    <string name="setting_language">Język</string>
+    <string name="setting_language_desc">Język wyświetlania aplikacji</string>
+    <string name="language_english">Angielski</string>
+    <string name="language_polish">Polski</string>
+
+    <!-- About screen -->
+    <string name="about_title">Info</string>
+    <string name="about_version">v1.0.0-dev</string>
+    <string name="about_description">Authenticator 2FA z kluczami FIDO2/WebAuthn passkeys i transportem hybrydowym caBLE v2.</string>
+    <string name="about_author">by Adam /swarogan/ Sobociński</string>
+    <string name="about_website">vim.pl</string>
+    <string name="about_website_url">https://vim.pl</string>
+    <string name="about_github">github.com/swarogan</string>
+    <string name="about_github_url">https://github.com/swarogan</string>
+    <string name="about_x">x.com/swarogan</string>
+    <string name="about_x_url">https://x.com/swarogan</string>
+</resources>

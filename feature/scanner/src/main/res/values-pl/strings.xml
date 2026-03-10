@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="camera_permission_required">Wymagane uprawnienie kamery</string>
+    <string name="grant_permission">Przyznaj uprawnienie</string>
+</resources>

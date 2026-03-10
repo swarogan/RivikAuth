@@ -1,0 +1,50 @@
+package dev.rivikauth.core.database.di
+
+import android.content.Context
+import androidx.room.Room
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import dev.rivikauth.core.database.VaultDatabase
+import dev.rivikauth.core.database.dao.OtpEntryDao
+import dev.rivikauth.core.database.dao.FidoCredentialDao
+import dev.rivikauth.core.database.dao.EntryGroupDao
+import dev.rivikauth.core.database.RoomFidoCredentialStore
+import dev.rivikauth.lib.cable.FidoCredentialStore
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+object DatabaseModule {
+
+    @Provides
+    @Singleton
+    fun provideDatabase(
+        @ApplicationContext context: Context,
+        passphraseProvider: DatabasePassphraseProvider,
+    ): VaultDatabase {
+        System.loadLibrary("sqlcipher")
+        val factory = SupportOpenHelperFactory(passphraseProvider.getPassphrase())
+        return Room.databaseBuilder(context, VaultDatabase::class.java, "vault.db")
+            .openHelperFactory(factory)
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    @Provides
+    fun provideOtpEntryDao(db: VaultDatabase): OtpEntryDao = db.otpEntryDao()
+
+    @Provides
+    fun provideFidoCredentialDao(db: VaultDatabase): FidoCredentialDao = db.fidoCredentialDao()
+
+    @Provides
+    fun provideEntryGroupDao(db: VaultDatabase): EntryGroupDao = db.entryGroupDao()
+
+    @Provides
+    @Singleton
+    fun provideFidoCredentialStore(dao: FidoCredentialDao): FidoCredentialStore =
+        RoomFidoCredentialStore(dao)
+}

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="otp_title">OTP Codes</string>
+    <string name="otp_search">Search\u2026</string>
+    <string name="otp_empty_title">No OTP codes</string>
+    <string name="otp_empty_subtitle">Scan a QR code to add an entry</string>
+    <string name="otp_favorite">Favorite</string>
+    <string name="otp_copy">Copy</string>
+    <string name="otp_delete_title">Delete entry?</string>
+    <string name="otp_delete_message">The OTP entry for %1$s will be permanently deleted.</string>
+    <string name="otp_delete">Delete</string>
+    <string name="otp_cancel">Cancel</string>
+    <string name="otp_action_copy">Copy code</string>
+    <string name="otp_action_favorite">Add to favorites</string>
+    <string name="otp_action_unfavorite">Remove from favorites</string>
+</resources>

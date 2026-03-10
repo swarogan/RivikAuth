@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Setup -->
+    <string name="setup_title">Ustaw hasło vault</string>
+    <string name="setup_subtitle">To hasło chroni Twoje kody OTP i klucze FIDO</string>
+    <string name="setup_password">Hasło</string>
+    <string name="setup_confirm_password">Potwierdź hasło</string>
+    <string name="setup_creating">Tworzenie vault\u2026</string>
+    <string name="setup_error_min_length">Hasło musi mieć minimum 8 znaków</string>
+    <string name="setup_error_mismatch">Hasła się nie zgadzają</string>
+    <string name="setup_create_button">Utwórz vault</string>
+    <string name="strength_weak">Słabe</string>
+    <string name="strength_moderate">Przeciętne</string>
+    <string name="strength_good">Dobre</string>
+    <string name="strength_strong">Silne</string>
+    <string name="strength_very_strong">Bardzo silne</string>
+
+    <!-- Unlock -->
+    <string name="unlock_subtitle">Odblokuj aby kontynuować</string>
+    <string name="unlock_password">Hasło</string>
+    <string name="unlock_show_password">Pokaż hasło</string>
+    <string name="unlock_button">Odblokuj</string>
+    <string name="unlock_biometric">Biometria</string>
+    <string name="unlock_loading">Odblokowywanie\u2026</string>
+</resources>

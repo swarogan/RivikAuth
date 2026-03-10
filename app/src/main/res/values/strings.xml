@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RivikAuth</string>
+
+    <!-- Bottom bar -->
+    <string name="tab_otp">OTP</string>
+    <string name="tab_passkeys">Passkeys</string>
+    <string name="tab_scan">Scan</string>
+    <string name="tab_settings">Settings</string>
+    <string name="tab_about">Info</string>
+
+    <!-- Credential provider dialog -->
+    <string name="provider_dialog_title">Enable credential provider</string>
+    <string name="provider_dialog_message">To use passkeys, enable RivikAuthenticator as a provider in system settings.</string>
+    <string name="provider_dialog_confirm">Open settings</string>
+    <string name="provider_dialog_dismiss">Don\'t show again</string>
+</resources>
