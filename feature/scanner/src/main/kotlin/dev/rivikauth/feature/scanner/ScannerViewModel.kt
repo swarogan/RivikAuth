@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.rivikauth.core.database.dao.OtpEntryDao
-import dev.rivikauth.core.database.entity.OtpEntryEntity
+import dev.rivikauth.core.database.toEntity
 import dev.rivikauth.core.model.OtpEntry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -53,26 +53,6 @@ class ScannerViewModel @Inject constructor(
         _uiState.value = ScannerUiState.Scanning
     }
 }
-
-private fun OtpEntry.toEntity(): OtpEntryEntity = OtpEntryEntity(
-    id = id,
-    name = name,
-    issuer = issuer,
-    type = type.name,
-    secret = secret,
-    algorithm = algorithm.name,
-    digits = digits,
-    period = period,
-    counter = counter,
-    pin = pin,
-    groupIds = groupIds.joinToString(","),
-    sortOrder = sortOrder,
-    note = note,
-    favorite = favorite,
-    iconData = iconData,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
-)
 
 sealed interface ScannerUiState {
     data object Scanning : ScannerUiState

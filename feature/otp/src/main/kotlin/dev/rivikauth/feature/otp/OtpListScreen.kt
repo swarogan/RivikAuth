@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.rivikauth.core.model.OtpEntry
 import kotlinx.coroutines.android.awaitFrame
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,7 +91,6 @@ fun OtpListScreen(
     var totpProgress by remember { mutableFloatStateOf(1f) }
     var totpRemaining by remember { mutableFloatStateOf(30f) }
     var codeTimerState by remember { mutableStateOf(CodeTimerState.Normal) }
-
     LaunchedEffect(Unit) {
         while (true) {
             awaitFrame()

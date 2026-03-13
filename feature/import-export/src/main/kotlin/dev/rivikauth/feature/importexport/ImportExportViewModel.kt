@@ -6,7 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.rivikauth.core.database.dao.OtpEntryDao
-import dev.rivikauth.core.database.entity.OtpEntryEntity
+import dev.rivikauth.core.database.toEntity
+import dev.rivikauth.core.database.toModel
 import dev.rivikauth.core.model.OtpEntry
 import dev.rivikauth.feature.importexport.exporter.VaultExporter
 import dev.rivikauth.feature.importexport.importer.AegisImporter
@@ -129,45 +130,6 @@ class ImportExportViewModel @Inject constructor(
         _uiState.update { it.copy(message = null, error = null) }
     }
 
-    private fun OtpEntry.toEntity(): OtpEntryEntity = OtpEntryEntity(
-        id = id,
-        name = name,
-        issuer = issuer,
-        type = type.name,
-        secret = secret,
-        algorithm = algorithm.name,
-        digits = digits,
-        period = period,
-        counter = counter,
-        pin = pin,
-        groupIds = groupIds.joinToString(","),
-        sortOrder = sortOrder,
-        note = note,
-        favorite = favorite,
-        iconData = iconData,
-        createdAt = createdAt,
-        updatedAt = updatedAt,
-    )
-
-    private fun OtpEntryEntity.toModel(): OtpEntry = OtpEntry(
-        id = id,
-        name = name,
-        issuer = issuer,
-        type = dev.rivikauth.core.model.OtpType.valueOf(type),
-        secret = secret,
-        algorithm = dev.rivikauth.core.model.HashAlgorithm.valueOf(algorithm),
-        digits = digits,
-        period = period,
-        counter = counter,
-        pin = pin,
-        groupIds = if (groupIds.isBlank()) emptySet() else groupIds.split(",").toSet(),
-        sortOrder = sortOrder,
-        note = note,
-        favorite = favorite,
-        iconData = iconData,
-        createdAt = createdAt,
-        updatedAt = updatedAt,
-    )
 }
 
 data class ImportExportUiState(

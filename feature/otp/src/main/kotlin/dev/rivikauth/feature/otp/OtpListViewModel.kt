@@ -4,10 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.rivikauth.core.database.dao.OtpEntryDao
-import dev.rivikauth.core.database.entity.OtpEntryEntity
-import dev.rivikauth.core.model.HashAlgorithm
+import dev.rivikauth.core.database.toEntity
+import dev.rivikauth.core.database.toModel
 import dev.rivikauth.core.model.OtpEntry
-import dev.rivikauth.core.model.OtpType
 import dev.rivikauth.core.crypto.otp.OtpGenerator
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -91,46 +90,6 @@ class OtpListViewModel @Inject constructor(
         _uiState.update { it.copy(searchQuery = query) }
     }
 }
-
-private fun OtpEntryEntity.toModel(): OtpEntry = OtpEntry(
-    id = id,
-    name = name,
-    issuer = issuer,
-    type = OtpType.valueOf(type),
-    secret = secret,
-    algorithm = HashAlgorithm.valueOf(algorithm),
-    digits = digits,
-    period = period,
-    counter = counter,
-    pin = pin,
-    groupIds = if (groupIds.isBlank()) emptySet() else groupIds.split(",").toSet(),
-    sortOrder = sortOrder,
-    note = note,
-    favorite = favorite,
-    iconData = iconData,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
-)
-
-private fun OtpEntry.toEntity(): OtpEntryEntity = OtpEntryEntity(
-    id = id,
-    name = name,
-    issuer = issuer,
-    type = type.name,
-    secret = secret,
-    algorithm = algorithm.name,
-    digits = digits,
-    period = period,
-    counter = counter,
-    pin = pin,
-    groupIds = groupIds.joinToString(","),
-    sortOrder = sortOrder,
-    note = note,
-    favorite = favorite,
-    iconData = iconData,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
-)
 
 data class OtpListUiState(
     val entries: List<OtpEntry> = emptyList(),
