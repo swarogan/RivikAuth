@@ -35,9 +35,12 @@ class OtpListViewModel @Inject constructor(
             otpEntryDao.observeAll().collect { entities ->
                 val entries = entities.map { it.toModel() }
                 _uiState.update { it.copy(entries = entries) }
+                refreshCodes()
             }
         }
     }
+
+    private var lastPeriodKeys: Map<String, Long> = emptyMap()
 
     private fun startCodeRefresh() {
         viewModelScope.launch {
@@ -49,11 +52,24 @@ class OtpListViewModel @Inject constructor(
     }
 
     private fun refreshCodes() {
+        val now = System.currentTimeMillis()
         val entries = _uiState.value.entries
-        val codes = entries.associate { entry ->
-            entry.id to OtpGenerator.generate(entry)
+        val currentCodes = _uiState.value.codes
+
+        val newPeriodKeys = entries.associate { entry ->
+            val period = if (entry.period > 0) entry.period else 30
+            entry.id to (now / 1000 / period)
         }
-        _uiState.update { it.copy(codes = codes, currentTime = System.currentTimeMillis()) }
+
+        if (currentCodes.isEmpty() || newPeriodKeys != lastPeriodKeys) {
+            val codes = entries.associate { entry ->
+                entry.id to OtpGenerator.generate(entry)
+            }
+            lastPeriodKeys = newPeriodKeys
+            _uiState.update { it.copy(codes = codes, currentTime = now) }
+        } else {
+            _uiState.update { it.copy(currentTime = now) }
+        }
     }
 
     fun toggleFavorite(entryId: String) {
