@@ -44,14 +44,7 @@ object OtpAuthUriParser {
         val secret = params["secret"]
             ?: throw IllegalArgumentException("Missing secret parameter")
 
-        val algorithm = params["algorithm"]?.let {
-            when (it.uppercase()) {
-                "SHA1" -> HashAlgorithm.SHA1
-                "SHA256" -> HashAlgorithm.SHA256
-                "SHA512" -> HashAlgorithm.SHA512
-                else -> HashAlgorithm.SHA1
-            }
-        } ?: HashAlgorithm.SHA1
+        val algorithm = HashAlgorithm.fromString(params["algorithm"] ?: "SHA1")
 
         val digits = params["digits"]?.toIntOrNull() ?: when (type) {
             OtpType.STEAM -> 5

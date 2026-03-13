@@ -83,7 +83,7 @@ class AegisImporter : Importer {
             Base32.decode(secretBase32)
         }
 
-        val algorithm = parseAlgorithm(info.optString("algo", "SHA1"))
+        val algorithm = HashAlgorithm.fromString(info.optString("algo", "SHA1"))
         val digits = info.optInt("digits", if (type == OtpType.STEAM) 5 else 6)
         val period = info.optInt("period", if (type == OtpType.MOTP) 10 else 30)
         val counter = info.optLong("counter", 0L)
@@ -103,10 +103,4 @@ class AegisImporter : Importer {
         )
     }
 
-    private fun parseAlgorithm(algo: String): HashAlgorithm = when (algo.uppercase()) {
-        "SHA256" -> HashAlgorithm.SHA256
-        "SHA512" -> HashAlgorithm.SHA512
-        "MD5" -> HashAlgorithm.MD5
-        else -> HashAlgorithm.SHA1
-    }
 }

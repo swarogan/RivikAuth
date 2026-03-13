@@ -50,11 +50,7 @@ class GoogleAuthImporter : Importer {
             val secretBase32 = params["secret"] ?: return null
             val secret = Base32.decode(secretBase32)
 
-            val algorithm = when (params["algorithm"]?.uppercase()) {
-                "SHA256" -> HashAlgorithm.SHA256
-                "SHA512" -> HashAlgorithm.SHA512
-                else -> HashAlgorithm.SHA1
-            }
+            val algorithm = HashAlgorithm.fromString(params["algorithm"] ?: "SHA1")
 
             val digits = params["digits"]?.toIntOrNull() ?: when (type) {
                 OtpType.STEAM -> 5

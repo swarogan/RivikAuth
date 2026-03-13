@@ -69,12 +69,7 @@ class TwoFASImporter : Importer {
             else -> OtpType.TOTP
         }
 
-        val algorithm = when (otp.optString("algorithm", "SHA1").uppercase()) {
-            "SHA256" -> HashAlgorithm.SHA256
-            "SHA512" -> HashAlgorithm.SHA512
-            "MD5" -> HashAlgorithm.MD5
-            else -> HashAlgorithm.SHA1
-        }
+        val algorithm = HashAlgorithm.fromString(otp.optString("algorithm", "SHA1"))
 
         val digits = otp.optInt("digits", if (type == OtpType.STEAM) 5 else 6)
         val period = otp.optInt("period", 30)
