@@ -1,4 +1,4 @@
-package dev.rivikauth.feature.scanner
+package dev.rivikauth.core.common
 
 import dev.rivikauth.core.model.HashAlgorithm
 import dev.rivikauth.core.model.OtpEntry
@@ -21,7 +21,7 @@ object OtpAuthUriParser {
         return when (scheme) {
             "otpauth" -> parseOtpAuth(uri)
             "motp" -> parseMotp(uri)
-            else -> throw IllegalArgumentException("Nieobsługiwany schemat: $scheme (oczekiwano otpauth:// lub motp://)")
+            else -> throw IllegalArgumentException("Unsupported scheme: $scheme (expected otpauth:// or motp://)")
         }
     }
 
@@ -55,7 +55,7 @@ object OtpAuthUriParser {
             name = name,
             issuer = issuerParam,
             type = type,
-            secret = base32Decode(secret),
+            secret = Base32.decode(secret),
             algorithm = algorithm,
             digits = digits,
             period = period,
@@ -103,27 +103,5 @@ object OtpAuthUriParser {
             val value = if (parts.size > 1) URLDecoder.decode(parts[1], "UTF-8") else ""
             key to value
         }
-    }
-
-    private val BASE32_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
-
-    fun base32Decode(input: String): ByteArray {
-        val cleaned = input.uppercase().replace("=", "").replace(" ", "")
-        val output = ByteArray(cleaned.length * 5 / 8)
-        var buffer = 0L
-        var bitsLeft = 0
-        var outputIndex = 0
-
-        for (c in cleaned) {
-            val value = BASE32_CHARS.indexOf(c)
-            if (value < 0) throw IllegalArgumentException("Invalid Base32 character: $c")
-            buffer = (buffer shl 5) or value.toLong()
-            bitsLeft += 5
-            if (bitsLeft >= 8) {
-                bitsLeft -= 8
-                output[outputIndex++] = ((buffer shr bitsLeft) and 0xFF).toByte()
-            }
-        }
-        return output.copyOfRange(0, outputIndex)
     }
 }

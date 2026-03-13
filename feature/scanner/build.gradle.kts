@@ -11,6 +11,7 @@ dependencies {
     implementation(libs.camerax.lifecycle)
     implementation(libs.camerax.view)
     implementation(libs.zxing.core)
+    implementation(project(":core:common"))
     implementation(project(":core:model"))
     implementation(project(":core:database"))
     testImplementation(libs.junit5.api)

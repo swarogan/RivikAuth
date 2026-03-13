@@ -3,6 +3,7 @@ package dev.rivikauth.feature.scanner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.rivikauth.core.common.OtpAuthUriParser
 import dev.rivikauth.core.database.dao.OtpEntryDao
 import dev.rivikauth.core.database.toEntity
 import dev.rivikauth.core.model.OtpEntry

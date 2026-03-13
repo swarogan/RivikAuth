@@ -1,5 +1,6 @@
 package dev.rivikauth.feature.importexport.importer
 
+import dev.rivikauth.core.common.Base32
 import dev.rivikauth.core.model.HashAlgorithm
 import dev.rivikauth.core.model.OtpEntry
 import dev.rivikauth.core.model.OtpType

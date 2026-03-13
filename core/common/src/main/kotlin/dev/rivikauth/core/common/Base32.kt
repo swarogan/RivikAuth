@@ -1,6 +1,6 @@
-package dev.rivikauth.feature.importexport.importer
+package dev.rivikauth.core.common
 
-internal object Base32 {
+object Base32 {
 
     private const val ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
 

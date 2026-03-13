@@ -1,5 +1,7 @@
 package dev.rivikauth.feature.scanner
 
+import dev.rivikauth.core.common.Base32
+import dev.rivikauth.core.common.OtpAuthUriParser
 import dev.rivikauth.core.model.HashAlgorithm
 import dev.rivikauth.core.model.OtpType
 import org.junit.jupiter.api.Assertions.*
@@ -73,7 +75,7 @@ class OtpAuthUriParserTest {
     @Test
     fun `base32 decode known value`() {
         // RFC 4648 test vector: "foobar" = MZXW6YTBOI======
-        val decoded = OtpAuthUriParser.base32Decode("MZXW6YTBOI")
+        val decoded = Base32.decode("MZXW6YTBOI")
         assertEquals("foobar", String(decoded))
     }
 }

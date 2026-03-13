@@ -1,7 +1,7 @@
 package dev.rivikauth.feature.importexport.exporter
 
 import dev.rivikauth.core.model.OtpEntry
-import dev.rivikauth.feature.importexport.importer.Base32
+import dev.rivikauth.core.common.Base32
 import org.json.JSONArray
 import org.json.JSONObject
 

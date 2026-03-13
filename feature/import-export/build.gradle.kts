@@ -10,6 +10,7 @@ dependencies {
     implementation(libs.compose.material.icons)
     implementation(libs.activity.compose)
     implementation(libs.kotlinx.serialization.json)
+    implementation(project(":core:common"))
     implementation(project(":core:model"))
     implementation(project(":core:crypto"))
     implementation(project(":core:database"))
