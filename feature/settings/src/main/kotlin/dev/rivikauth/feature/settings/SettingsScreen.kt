@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
+import android.nfc.NfcManager
 import android.util.Log
 import android.widget.Toast
 import dev.rivikauth.core.crypto.BiometricUnlockManager
@@ -154,6 +155,19 @@ fun SettingsScreen(
                     checked = uiState.bleEnabled,
                     onCheckedChange = {},
                     enabled = false,
+                )
+
+                val hasNfc = remember {
+                    val nfcManager = context.getSystemService(NfcManager::class.java)
+                    nfcManager?.defaultAdapter != null
+                }
+                SwitchSetting(
+                    icon = Icons.Default.Nfc,
+                    title = stringResource(R.string.setting_nfc),
+                    description = stringResource(R.string.setting_nfc_desc),
+                    checked = uiState.nfcEnabled,
+                    onCheckedChange = viewModel::setNfcEnabled,
+                    enabled = hasNfc,
                 )
             }
 

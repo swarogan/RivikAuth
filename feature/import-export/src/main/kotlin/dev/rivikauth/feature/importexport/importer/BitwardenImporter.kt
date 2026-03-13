@@ -33,22 +33,25 @@ class BitwardenImporter : Importer {
 
     override val name: String = "Bitwarden"
 
-    override fun parse(input: InputStream): List<OtpEntry> {
+    override fun parse(input: InputStream): ImportResult {
         val json = JSONObject(input.bufferedReader().readText())
 
         val items = json.optJSONArray("items")
             ?: throw IllegalArgumentException("Missing 'items' array in Bitwarden export")
 
         val result = mutableListOf<OtpEntry>()
+        var skipped = 0
 
         for (i in 0 until items.length()) {
             val item = items.getJSONObject(i)
             val parsed = parseItem(item)
             if (parsed != null) {
                 result.add(parsed)
+            } else if (item.optJSONObject("login")?.optString("totp", "")?.isNotBlank() == true) {
+                skipped++
             }
         }
-        return result
+        return ImportResult(result, skipped)
     }
 
     private fun parseItem(item: JSONObject): OtpEntry? {

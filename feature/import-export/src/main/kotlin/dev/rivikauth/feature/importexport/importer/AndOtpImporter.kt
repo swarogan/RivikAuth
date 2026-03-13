@@ -31,19 +31,22 @@ class AndOtpImporter : Importer {
 
     override val name: String = "andOTP"
 
-    override fun parse(input: InputStream): List<OtpEntry> {
+    override fun parse(input: InputStream): ImportResult {
         val array = JSONArray(input.bufferedReader().readText())
 
         val result = mutableListOf<OtpEntry>()
+        var skipped = 0
 
         for (i in 0 until array.length()) {
             val entry = array.getJSONObject(i)
             val parsed = parseEntry(entry)
             if (parsed != null) {
                 result.add(parsed)
+            } else {
+                skipped++
             }
         }
-        return result
+        return ImportResult(result, skipped)
     }
 
     private fun parseEntry(entry: JSONObject): OtpEntry? {

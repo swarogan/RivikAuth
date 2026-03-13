@@ -73,6 +73,7 @@ dependencies {
     implementation(project(":feature:import-export"))
     implementation(project(":service:credential"))
     implementation(project(":service:ble"))
+    implementation(project(":service:nfc"))
     debugImplementation(libs.compose.ui.tooling)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.runner)

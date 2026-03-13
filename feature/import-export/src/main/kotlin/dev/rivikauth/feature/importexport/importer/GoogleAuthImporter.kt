@@ -17,14 +17,21 @@ class GoogleAuthImporter : Importer {
 
     override val name: String = "Google Authenticator"
 
-    override fun parse(input: InputStream): List<OtpEntry> {
-        return input.bufferedReader()
+    override fun parse(input: InputStream): ImportResult {
+        var skipped = 0
+        val entries = input.bufferedReader()
             .lineSequence()
             .map { it.trim() }
             .filter { it.startsWith("otpauth://", ignoreCase = true) }
             .mapNotNull { uri ->
-                try { OtpAuthUriParser.parse(uri) } catch (_: Exception) { null }
+                try {
+                    OtpAuthUriParser.parse(uri)
+                } catch (_: Exception) {
+                    skipped++
+                    null
+                }
             }
             .toList()
+        return ImportResult(entries, skipped)
     }
 }

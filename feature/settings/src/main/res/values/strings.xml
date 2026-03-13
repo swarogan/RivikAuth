@@ -20,6 +20,8 @@
     <string name="section_bluetooth">Bluetooth</string>
     <string name="setting_ble">BLE Authenticator</string>
     <string name="setting_ble_desc">Act as FIDO2 roaming authenticator</string>
+    <string name="setting_nfc">NFC Authenticator</string>
+    <string name="setting_nfc_desc">Use phone as NFC security key</string>
     <string name="section_data">Data</string>
     <string name="setting_import_export">Import / Export</string>
     <string name="setting_import_export_desc">Import or export data</string>

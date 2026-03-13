@@ -65,6 +65,11 @@ class SettingsViewModel @Inject constructor(
                 _uiState.update { it.copy(bleEnabled = enabled) }
             }
         }
+        viewModelScope.launch {
+            appPrefsStore.nfcEnabled().collect { enabled ->
+                _uiState.update { it.copy(nfcEnabled = enabled) }
+            }
+        }
     }
 
     fun requestBiometricEnrollment() {
@@ -119,6 +124,10 @@ class SettingsViewModel @Inject constructor(
         _uiState.update { it.copy(bleEnabled = enabled) }
         viewModelScope.launch { appPrefsStore.setBleEnabled(enabled) }
     }
+    fun setNfcEnabled(enabled: Boolean) {
+        _uiState.update { it.copy(nfcEnabled = enabled) }
+        viewModelScope.launch { appPrefsStore.setNfcEnabled(enabled) }
+    }
     fun setShowSuccessOnAuth(enabled: Boolean) {
         _uiState.update { it.copy(showSuccessOnAuth = enabled) }
         viewModelScope.launch { appPrefsStore.setShowSuccessOnAuth(enabled) }
@@ -131,5 +140,6 @@ data class SettingsUiState(
     val panicWipeEnabled: Boolean = false,
     val darkTheme: Boolean = true,
     val bleEnabled: Boolean = false,
+    val nfcEnabled: Boolean = false,
     val showSuccessOnAuth: Boolean = true,
 )

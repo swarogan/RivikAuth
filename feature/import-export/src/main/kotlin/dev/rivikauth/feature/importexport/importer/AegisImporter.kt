@@ -39,7 +39,7 @@ class AegisImporter : Importer {
 
     override val name: String = "Aegis"
 
-    override fun parse(input: InputStream): List<OtpEntry> {
+    override fun parse(input: InputStream): ImportResult {
         val json = JSONObject(input.bufferedReader().readText())
 
         val db = json.optJSONObject("db")
@@ -49,15 +49,18 @@ class AegisImporter : Importer {
             ?: throw IllegalArgumentException("Missing 'entries' array in Aegis export")
 
         val result = mutableListOf<OtpEntry>()
+        var skipped = 0
 
         for (i in 0 until entriesArray.length()) {
             val entry = entriesArray.getJSONObject(i)
             val parsed = parseEntry(entry)
             if (parsed != null) {
                 result.add(parsed)
+            } else {
+                skipped++
             }
         }
-        return result
+        return ImportResult(result, skipped)
     }
 
     private fun parseEntry(entry: JSONObject): OtpEntry? {

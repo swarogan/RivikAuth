@@ -51,11 +51,11 @@ class ImportExportViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null, message = null) }
             try {
-                val entries = context.contentResolver.openInputStream(uri)?.use { stream ->
+                val result = context.contentResolver.openInputStream(uri)?.use { stream ->
                     importer.parse(stream)
                 } ?: throw IllegalStateException("Nie udalo sie otworzyc pliku")
 
-                if (entries.isEmpty()) {
+                if (result.entries.isEmpty()) {
                     _uiState.update {
                         it.copy(
                             isLoading = false,
@@ -65,13 +65,17 @@ class ImportExportViewModel @Inject constructor(
                     return@launch
                 }
 
-                val entities = entries.map { it.toEntity() }
+                val entities = result.entries.map { it.toEntity() }
                 otpEntryDao.upsertAll(entities)
+
+                val skippedInfo = if (result.skipped > 0) {
+                    " (pominieto ${result.skipped} blednych)"
+                } else ""
 
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        message = "Zaimportowano ${entries.size} wpisow z ${importer.name}",
+                        message = "Zaimportowano ${result.entries.size} wpisow z ${importer.name}$skippedInfo",
                     )
                 }
             } catch (e: Exception) {

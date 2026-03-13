@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nfc_fido_description">FIDO2 NFC Authenticator</string>
+    <string name="nfc_unlock_title">Vault locked</string>
+    <string name="nfc_unlock_text">Unlock vault to use NFC authenticator</string>
+</resources>

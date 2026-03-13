@@ -86,7 +86,7 @@ fun FidoListScreen(
                         credential = credential,
                         dateFormat = dateFormat,
                         onDelete = { viewModel.deleteCredential(credential.credentialId) },
-                        modifier = Modifier.animateItem(),
+                        modifier = Modifier,
                     )
                 }
             }

@@ -35,22 +35,25 @@ class TwoFASImporter : Importer {
 
     override val name: String = "2FAS"
 
-    override fun parse(input: InputStream): List<OtpEntry> {
+    override fun parse(input: InputStream): ImportResult {
         val json = JSONObject(input.bufferedReader().readText())
 
         val services = json.optJSONArray("services")
             ?: throw IllegalArgumentException("Missing 'services' array in 2FAS export")
 
         val result = mutableListOf<OtpEntry>()
+        var skipped = 0
 
         for (i in 0 until services.length()) {
             val service = services.getJSONObject(i)
             val parsed = parseService(service)
             if (parsed != null) {
                 result.add(parsed)
+            } else {
+                skipped++
             }
         }
-        return result
+        return ImportResult(result, skipped)
     }
 
     private fun parseService(service: JSONObject): OtpEntry? {

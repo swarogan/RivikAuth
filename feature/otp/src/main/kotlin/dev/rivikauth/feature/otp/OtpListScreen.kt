@@ -52,16 +52,14 @@ fun OtpListScreen(
     var entryToDelete by remember { mutableStateOf<OtpEntry?>(null) }
     var menuEntry by remember { mutableStateOf<OtpEntry?>(null) }
 
-    val filteredEntries = remember(uiState.entries, uiState.searchQuery) {
-        val q = uiState.searchQuery.lowercase()
-        if (q.isEmpty()) uiState.entries
+    val (favorites, others) = remember(uiState.entries, uiState.searchQuery) {
+        val q = uiState.searchQuery
+        val filtered = if (q.isEmpty()) uiState.entries
         else uiState.entries.filter {
-            it.name.lowercase().contains(q) || it.issuer.lowercase().contains(q)
+            it.name.contains(q, ignoreCase = true) || it.issuer.contains(q, ignoreCase = true)
         }
+        filtered.partition { it.favorite }
     }
-
-    val favorites = filteredEntries.filter { it.favorite }
-    val others = filteredEntries.filter { !it.favorite }
 
     // Dialog potwierdzenia usunięcia
     if (entryToDelete != null) {
@@ -156,7 +154,7 @@ fun OtpListScreen(
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
             // Wspólny pasek postępu TOTP
-            if (filteredEntries.isNotEmpty()) {
+            if (favorites.isNotEmpty() || others.isNotEmpty()) {
                 LinearProgressIndicator(
                     progress = { totpProgress },
                     modifier = Modifier
@@ -192,7 +190,7 @@ fun OtpListScreen(
                 }
             }
 
-            if (filteredEntries.isEmpty()) {
+            if (favorites.isEmpty() && others.isEmpty()) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()

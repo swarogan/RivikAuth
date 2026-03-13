@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-feature android:name="android.hardware.nfc.hce" android:required="false" />
 
     <application
         android:name=".RivikAuthApp"
@@ -37,6 +39,18 @@
             <meta-data
                 android:name="android.credentials.provider"
                 android:resource="@xml/provider" />
+        </service>
+
+        <service
+            android:name="dev.rivikauth.service.nfc.FidoNfcHceService"
+            android:exported="true"
+            android:permission="android.permission.BIND_NFC_SERVICE">
+            <intent-filter>
+                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.nfc.cardemulation.host_apdu_service"
+                android:resource="@xml/nfc_aid_list" />
         </service>
 
         <activity
