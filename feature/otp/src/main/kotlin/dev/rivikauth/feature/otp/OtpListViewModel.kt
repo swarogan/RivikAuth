@@ -51,13 +51,13 @@ class OtpListViewModel @Inject constructor(
     }
 
     private fun refreshCodes() {
-        val now = System.currentTimeMillis()
         val entries = _uiState.value.entries
         val currentCodes = _uiState.value.codes
+        val nowSeconds = System.currentTimeMillis() / 1000
 
         val newPeriodKeys = entries.associate { entry ->
             val period = if (entry.period > 0) entry.period else 30
-            entry.id to (now / 1000 / period)
+            entry.id to (nowSeconds / period)
         }
 
         if (currentCodes.isEmpty() || newPeriodKeys != lastPeriodKeys) {
@@ -65,9 +65,7 @@ class OtpListViewModel @Inject constructor(
                 entry.id to OtpGenerator.generate(entry)
             }
             lastPeriodKeys = newPeriodKeys
-            _uiState.update { it.copy(codes = codes, currentTime = now) }
-        } else {
-            _uiState.update { it.copy(currentTime = now) }
+            _uiState.update { it.copy(codes = codes) }
         }
     }
 
@@ -95,5 +93,4 @@ data class OtpListUiState(
     val entries: List<OtpEntry> = emptyList(),
     val codes: Map<String, String> = emptyMap(),
     val searchQuery: String = "",
-    val currentTime: Long = System.currentTimeMillis(),
 )
