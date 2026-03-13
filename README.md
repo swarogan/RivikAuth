@@ -98,4 +98,4 @@ Test coverage includes OTP generation (RFC 6238/4226 vectors), master key round-
 
 ## License
 
-All rights reserved.
+[MIT](LICENSE)
