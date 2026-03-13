@@ -108,12 +108,7 @@ class MainActivity : AppCompatActivity() {
                         val currentDestination = navBackStackEntry?.destination
 
                         val showBottomBar = currentDestination?.route?.let { route ->
-                            route.startsWith(Screen.OtpList::class.qualifiedName!!) ||
-                                route.startsWith(Screen.FidoList::class.qualifiedName!!) ||
-                                route.startsWith(Screen.Scanner::class.qualifiedName!!) ||
-                                route.startsWith(Screen.Settings::class.qualifiedName!!) ||
-                                route.startsWith(Screen.About::class.qualifiedName!!) ||
-                                route.startsWith(Screen.ImportExport::class.qualifiedName!!)
+                            BOTTOM_BAR_SCREENS.any { route.startsWith(it) }
                         } ?: false
 
                         if (showProviderDialog) {
@@ -228,5 +223,10 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "MainActivity"
         private const val KEY_PROVIDER_DIALOG_DISMISSED = "provider_dialog_dismissed"
         private const val INACTIVITY_TIMEOUT_MS = 5L * 60 * 1000 // 5 minutes
+
+        private val BOTTOM_BAR_SCREENS = listOf(
+            Screen.OtpList::class, Screen.FidoList::class, Screen.Scanner::class,
+            Screen.Settings::class, Screen.About::class, Screen.ImportExport::class,
+        ).mapNotNull { it.qualifiedName }
     }
 }
