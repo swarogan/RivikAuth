@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.MotionEvent
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +19,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -57,6 +60,7 @@ class MainActivity : AppCompatActivity() {
     private var providerCheckDone = false
     private var inactivityJob: Job? = null
     private var autoLockCached = true
+    private var lockGeneration by mutableIntStateOf(0)
 
     private val prefs by lazy {
         getSharedPreferences("rivik_prefs", MODE_PRIVATE)
@@ -98,53 +102,55 @@ class MainActivity : AppCompatActivity() {
                 if (vaultCreated == null) {
                     Box(Modifier.fillMaxSize())
                 } else {
-                    val navController = rememberNavController()
-                    val navBackStackEntry by navController.currentBackStackEntryAsState()
-                    val currentDestination = navBackStackEntry?.destination
+                    key(lockGeneration) {
+                        val navController = rememberNavController()
+                        val navBackStackEntry by navController.currentBackStackEntryAsState()
+                        val currentDestination = navBackStackEntry?.destination
 
-                    val showBottomBar = currentDestination?.route?.let { route ->
-                        route.startsWith(Screen.OtpList::class.qualifiedName!!) ||
-                            route.startsWith(Screen.FidoList::class.qualifiedName!!) ||
-                            route.startsWith(Screen.Scanner::class.qualifiedName!!) ||
-                            route.startsWith(Screen.Settings::class.qualifiedName!!) ||
-                            route.startsWith(Screen.About::class.qualifiedName!!) ||
-                            route.startsWith(Screen.ImportExport::class.qualifiedName!!)
-                    } ?: false
+                        val showBottomBar = currentDestination?.route?.let { route ->
+                            route.startsWith(Screen.OtpList::class.qualifiedName!!) ||
+                                route.startsWith(Screen.FidoList::class.qualifiedName!!) ||
+                                route.startsWith(Screen.Scanner::class.qualifiedName!!) ||
+                                route.startsWith(Screen.Settings::class.qualifiedName!!) ||
+                                route.startsWith(Screen.About::class.qualifiedName!!) ||
+                                route.startsWith(Screen.ImportExport::class.qualifiedName!!)
+                        } ?: false
 
-                    if (showProviderDialog) {
-                        AlertDialog(
-                            onDismissRequest = { dismissProviderDialog() },
-                            title = { Text(stringResource(R.string.provider_dialog_title)) },
-                            text = {
-                                Text(stringResource(R.string.provider_dialog_message))
-                            },
-                            confirmButton = {
-                                TextButton(onClick = {
-                                    dismissProviderDialog()
-                                    openCredentialProviderSettings()
-                                }) {
-                                    Text(stringResource(R.string.provider_dialog_confirm))
-                                }
-                            },
-                            dismissButton = {
-                                TextButton(onClick = { dismissProviderDialog() }) {
-                                    Text(stringResource(R.string.provider_dialog_dismiss))
-                                }
-                            },
-                        )
-                    }
+                        if (showProviderDialog) {
+                            AlertDialog(
+                                onDismissRequest = { dismissProviderDialog() },
+                                title = { Text(stringResource(R.string.provider_dialog_title)) },
+                                text = {
+                                    Text(stringResource(R.string.provider_dialog_message))
+                                },
+                                confirmButton = {
+                                    TextButton(onClick = {
+                                        dismissProviderDialog()
+                                        openCredentialProviderSettings()
+                                    }) {
+                                        Text(stringResource(R.string.provider_dialog_confirm))
+                                    }
+                                },
+                                dismissButton = {
+                                    TextButton(onClick = { dismissProviderDialog() }) {
+                                        Text(stringResource(R.string.provider_dialog_dismiss))
+                                    }
+                                },
+                            )
+                        }
 
-                    Scaffold(
-                        modifier = Modifier.fillMaxSize(),
-                        bottomBar = {
-                            if (showBottomBar) RivikBottomBar(navController)
-                        },
-                    ) { padding ->
-                        RivikNavHost(
-                            navController = navController,
-                            isVaultCreated = vaultCreated,
-                            modifier = Modifier.padding(padding),
-                        )
+                        Scaffold(
+                            modifier = Modifier.fillMaxSize(),
+                            bottomBar = {
+                                if (showBottomBar) RivikBottomBar(navController)
+                            },
+                        ) { padding ->
+                            RivikNavHost(
+                                navController = navController,
+                                isVaultCreated = vaultCreated,
+                                modifier = Modifier.padding(padding),
+                            )
+                        }
                     }
                 }
             }
@@ -153,6 +159,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        if (autoLockCached && !passphraseHolder.isUnlocked()) {
+            lockGeneration++
+        }
         resetInactivityTimer()
     }
 
@@ -165,7 +174,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun dispatchTouchEvent(ev: android.view.MotionEvent?): Boolean {
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         resetInactivityTimer()
         return super.dispatchTouchEvent(ev)
     }
@@ -176,7 +185,7 @@ class MainActivity : AppCompatActivity() {
             inactivityJob = lifecycleScope.launch {
                 delay(INACTIVITY_TIMEOUT_MS)
                 passphraseHolder.clear()
-                recreate()
+                lockGeneration++
             }
         }
     }
