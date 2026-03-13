@@ -62,12 +62,7 @@ class TwoFASImporter : Importer {
         val account = otp.optString("account", "")
         val tokenType = otp.optString("tokenType", "TOTP").uppercase()
 
-        val type = when (tokenType) {
-            "TOTP" -> OtpType.TOTP
-            "HOTP" -> OtpType.HOTP
-            "STEAM" -> OtpType.STEAM
-            else -> OtpType.TOTP
-        }
+        val type = OtpType.fromString(tokenType) ?: OtpType.TOTP
 
         val algorithm = HashAlgorithm.fromString(otp.optString("algorithm", "SHA1"))
 

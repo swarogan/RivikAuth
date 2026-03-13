@@ -47,13 +47,7 @@ class AndOtpImporter : Importer {
 
     private fun parseEntry(entry: JSONObject): OtpEntry? {
         val typeName = entry.optString("type", "TOTP").uppercase()
-        val type = when (typeName) {
-            "TOTP" -> OtpType.TOTP
-            "HOTP" -> OtpType.HOTP
-            "STEAM" -> OtpType.STEAM
-            "MOTP" -> OtpType.MOTP
-            else -> return null
-        }
+        val type = OtpType.fromString(typeName) ?: return null
 
         val secretBase32 = entry.optString("secret", "")
         if (secretBase32.isBlank()) return null

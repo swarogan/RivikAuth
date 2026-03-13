@@ -29,13 +29,8 @@ object OtpAuthUriParser {
         val host = uri.host?.lowercase()
             ?: throw IllegalArgumentException("Missing OTP type in URI")
 
-        val type = when (host) {
-            "totp" -> OtpType.TOTP
-            "hotp" -> OtpType.HOTP
-            "steam" -> OtpType.STEAM
-            "yaotp" -> OtpType.YANDEX
-            else -> throw IllegalArgumentException("Unknown OTP type: $host")
-        }
+        val type = OtpType.fromString(host)
+            ?: throw IllegalArgumentException("Unknown OTP type: $host")
 
         val path = uri.path?.removePrefix("/") ?: ""
         val (issuer, name) = parseLabel(path)

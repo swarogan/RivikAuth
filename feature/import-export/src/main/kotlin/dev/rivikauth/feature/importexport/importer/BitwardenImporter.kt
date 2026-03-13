@@ -72,12 +72,7 @@ class BitwardenImporter : Importer {
             if (uri.scheme?.lowercase() != "otpauth") return null
 
             val host = uri.host?.lowercase() ?: return null
-            val type = when (host) {
-                "totp" -> OtpType.TOTP
-                "hotp" -> OtpType.HOTP
-                "steam" -> OtpType.STEAM
-                else -> return null
-            }
+            val type = OtpType.fromString(host) ?: return null
 
             val path = uri.path?.removePrefix("/") ?: ""
             val (issuer, name) = parseLabel(path)

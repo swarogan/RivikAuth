@@ -60,15 +60,7 @@ class AegisImporter : Importer {
     }
 
     private fun parseEntry(entry: JSONObject): OtpEntry? {
-        val typeName = entry.optString("type", "").lowercase()
-        val type = when (typeName) {
-            "totp" -> OtpType.TOTP
-            "hotp" -> OtpType.HOTP
-            "steam" -> OtpType.STEAM
-            "motp" -> OtpType.MOTP
-            "yandex" -> OtpType.YANDEX
-            else -> return null
-        }
+        val type = OtpType.fromString(entry.optString("type", "")) ?: return null
 
         val name = entry.optString("name", "")
         val issuer = entry.optString("issuer", "")
