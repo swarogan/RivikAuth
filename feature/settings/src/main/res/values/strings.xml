@@ -9,6 +9,9 @@
     <string name="setting_auto_lock_desc">Lock when going to background</string>
     <string name="setting_panic_wipe">Panic wipe</string>
     <string name="setting_panic_wipe_desc">Erase data after 10 failed attempts</string>
+    <string name="setting_show_success_on_auth">Success screen on auth</string>
+    <string name="setting_show_success_on_auth_desc">Show confirmation after passkey authentication</string>
+    <string name="section_general">General</string>
     <string name="section_appearance">Appearance</string>
     <string name="setting_dark_theme">Dark theme</string>
     <string name="setting_dark_theme_desc">Use dark theme</string>

@@ -80,34 +80,7 @@ fun SettingsScreen(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            SettingsSection(stringResource(R.string.section_security)) {
-                SwitchSetting(
-                    icon = Icons.Default.Fingerprint,
-                    title = stringResource(R.string.setting_biometric),
-                    description = stringResource(R.string.setting_biometric_desc),
-                    checked = uiState.biometricEnabled,
-                    onCheckedChange = { enabled ->
-                        if (enabled) viewModel.requestBiometricEnrollment()
-                        else viewModel.disableBiometric()
-                    },
-                )
-                SwitchSetting(
-                    icon = Icons.Default.ScreenLockPortrait,
-                    title = stringResource(R.string.setting_auto_lock),
-                    description = stringResource(R.string.setting_auto_lock_desc),
-                    checked = uiState.autoLockEnabled,
-                    onCheckedChange = viewModel::setAutoLockEnabled,
-                )
-                SwitchSetting(
-                    icon = Icons.Default.Warning,
-                    title = stringResource(R.string.setting_panic_wipe),
-                    description = stringResource(R.string.setting_panic_wipe_desc),
-                    checked = uiState.panicWipeEnabled,
-                    onCheckedChange = viewModel::setPanicWipeEnabled,
-                )
-            }
-
-            SettingsSection(stringResource(R.string.section_appearance)) {
+            SettingsSection(stringResource(R.string.section_general)) {
                 SwitchSetting(
                     icon = Icons.Default.DarkMode,
                     title = stringResource(R.string.setting_dark_theme),
@@ -115,9 +88,6 @@ fun SettingsScreen(
                     checked = uiState.darkTheme,
                     onCheckedChange = viewModel::setDarkTheme,
                 )
-            }
-
-            SettingsSection(stringResource(R.string.section_language)) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -149,18 +119,49 @@ fun SettingsScreen(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+                SwitchSetting(
+                    icon = Icons.Default.CheckCircle,
+                    title = stringResource(R.string.setting_show_success_on_auth),
+                    description = stringResource(R.string.setting_show_success_on_auth_desc),
+                    checked = uiState.showSuccessOnAuth,
+                    onCheckedChange = viewModel::setShowSuccessOnAuth,
+                )
             }
 
-            // TODO: unhide when BLE persistent advertising is implemented
-//            SettingsSection(stringResource(R.string.section_bluetooth)) {
-//                SwitchSetting(
-//                    icon = Icons.Default.Bluetooth,
-//                    title = stringResource(R.string.setting_ble),
-//                    description = stringResource(R.string.setting_ble_desc),
-//                    checked = uiState.bleEnabled,
-//                    onCheckedChange = viewModel::setBleEnabled,
-//                )
-//            }
+            SettingsSection(stringResource(R.string.section_security)) {
+                SwitchSetting(
+                    icon = Icons.Default.Fingerprint,
+                    title = stringResource(R.string.setting_biometric),
+                    description = stringResource(R.string.setting_biometric_desc),
+                    checked = uiState.biometricEnabled,
+                    onCheckedChange = { enabled ->
+                        if (enabled) viewModel.requestBiometricEnrollment()
+                        else viewModel.disableBiometric()
+                    },
+                )
+                SwitchSetting(
+                    icon = Icons.Default.ScreenLockPortrait,
+                    title = stringResource(R.string.setting_auto_lock),
+                    description = stringResource(R.string.setting_auto_lock_desc),
+                    checked = uiState.autoLockEnabled,
+                    onCheckedChange = viewModel::setAutoLockEnabled,
+                )
+                SwitchSetting(
+                    icon = Icons.Default.Warning,
+                    title = stringResource(R.string.setting_panic_wipe),
+                    description = stringResource(R.string.setting_panic_wipe_desc),
+                    checked = uiState.panicWipeEnabled,
+                    onCheckedChange = viewModel::setPanicWipeEnabled,
+                )
+                SwitchSetting(
+                    icon = Icons.Default.Bluetooth,
+                    title = stringResource(R.string.setting_ble),
+                    description = stringResource(R.string.setting_ble_desc),
+                    checked = uiState.bleEnabled,
+                    onCheckedChange = {},
+                    enabled = false,
+                )
+            }
 
             SettingsSection(stringResource(R.string.section_data)) {
                 Row(
@@ -272,17 +273,18 @@ private fun SwitchSetting(
     description: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
+    enabled: Boolean = true,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        Icon(icon, contentDescription = null, tint = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline)
         Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.bodyLarge)
+            Text(title, style = MaterialTheme.typography.bodyLarge, color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline)
             Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
         }
-        Switch(checked = checked, onCheckedChange = onCheckedChange)
+        Switch(checked = checked, onCheckedChange = onCheckedChange, enabled = enabled)
     }
 }

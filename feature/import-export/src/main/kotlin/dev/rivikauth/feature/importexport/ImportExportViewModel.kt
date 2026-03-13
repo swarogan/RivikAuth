@@ -74,6 +74,7 @@ class ImportExportViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
+                if (e is kotlinx.coroutines.CancellationException) throw e
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -113,6 +114,7 @@ class ImportExportViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
+                if (e is kotlinx.coroutines.CancellationException) throw e
                 _uiState.update {
                     it.copy(
                         isLoading = false,

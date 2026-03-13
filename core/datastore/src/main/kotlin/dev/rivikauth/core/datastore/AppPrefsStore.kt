@@ -21,6 +21,7 @@ class AppPrefsStore @Inject constructor(
     private object Keys {
         val DARK_THEME = booleanPreferencesKey("dark_theme")
         val BIOMETRIC_ENABLED = booleanPreferencesKey("biometric_enabled")
+        val SHOW_SUCCESS_ON_AUTH = booleanPreferencesKey("show_success_on_auth")
     }
 
     fun darkTheme(): Flow<Boolean?> =
@@ -35,5 +36,12 @@ class AppPrefsStore @Inject constructor(
 
     suspend fun setBiometricEnabled(enabled: Boolean) {
         context.appPrefsDataStore.edit { it[Keys.BIOMETRIC_ENABLED] = enabled }
+    }
+
+    fun showSuccessOnAuth(): Flow<Boolean> =
+        context.appPrefsDataStore.data.map { it[Keys.SHOW_SUCCESS_ON_AUTH] ?: true }
+
+    suspend fun setShowSuccessOnAuth(enabled: Boolean) {
+        context.appPrefsDataStore.edit { it[Keys.SHOW_SUCCESS_ON_AUTH] = enabled }
     }
 }

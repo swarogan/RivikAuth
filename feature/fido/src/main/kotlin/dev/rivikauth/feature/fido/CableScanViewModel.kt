@@ -7,15 +7,21 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.rivikauth.core.database.di.VaultPassphraseHolder
+import dev.rivikauth.core.datastore.AppPrefsStore
 import dev.rivikauth.lib.cable.CableQrCode
 import dev.rivikauth.lib.cable.CableSession
 import dev.rivikauth.lib.cable.CtapProcessor
 import dev.rivikauth.lib.cable.FidoCredentialStore
 import dev.rivikauth.service.ble.CableBleAdvertiser
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,7 +32,7 @@ sealed interface CableScanUiState {
     data object Connecting : CableScanUiState
     data object Handshaking : CableScanUiState
     data object Processing : CableScanUiState
-    data object Success : CableScanUiState
+    data class Success(val wasCreation: Boolean) : CableScanUiState
     data class Error(val message: String) : CableScanUiState
 }
 
@@ -34,10 +40,15 @@ sealed interface CableScanUiState {
 class CableScanViewModel @Inject constructor(
     application: Application,
     private val credentialStore: FidoCredentialStore,
+    private val passphraseHolder: VaultPassphraseHolder,
+    private val appPrefsStore: AppPrefsStore,
 ) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow<CableScanUiState>(CableScanUiState.Scanning)
     val uiState: StateFlow<CableScanUiState> = _uiState.asStateFlow()
+
+    private val _autoDone = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val autoDone: SharedFlow<Unit> = _autoDone.asSharedFlow()
 
     private var sessionStarted = false
     private var pendingQrValue: String? = null
@@ -75,23 +86,34 @@ class CableScanViewModel @Inject constructor(
                 val qrData = CableQrCode.parse(rawValue)
                 Log.w(TAG, "caBLE QR parsed OK: tunnel=${qrData.tunnelServerDomain}, pubKey=${qrData.peerPublicKey.size}B, secret=${qrData.qrSecret.size}B")
 
-                // TODO: Get actual master key from vault
-                // For now, use a derived key from a placeholder
-                val masterKeyBytes = ByteArray(32) // placeholder - needs real vault integration
+                if (!passphraseHolder.isUnlocked()) {
+                    _uiState.value = CableScanUiState.Error("Vault is locked")
+                    sessionStarted = false
+                    return@launch
+                }
+                val masterKeyBytes = passphraseHolder.getPassphrase()
+
+                val showSuccessOnAuth = appPrefsStore.showSuccessOnAuth().first()
 
                 val ctapProcessor = CtapProcessor(credentialStore, masterKeyBytes)
                 val bleAdvertiser = CableBleAdvertiser(getApplication())
 
                 val session = CableSession(qrData, ctapProcessor, bleAdvertiser)
-                session.onStateChanged = { state ->
-                    _uiState.value = when (state) {
-                        is CableSession.SessionState.Advertising -> CableScanUiState.Advertising
-                        is CableSession.SessionState.Connecting -> CableScanUiState.Connecting
-                        is CableSession.SessionState.Handshaking -> CableScanUiState.Handshaking
-                        is CableSession.SessionState.Processing -> CableScanUiState.Processing
-                        is CableSession.SessionState.Success -> CableScanUiState.Success
-                        is CableSession.SessionState.Error -> CableScanUiState.Error(state.message)
-                        else -> _uiState.value
+                session.onStateChanged = callback@{ state ->
+                    when (state) {
+                        is CableSession.SessionState.Advertising -> _uiState.value = CableScanUiState.Advertising
+                        is CableSession.SessionState.Connecting -> _uiState.value = CableScanUiState.Connecting
+                        is CableSession.SessionState.Handshaking -> _uiState.value = CableScanUiState.Handshaking
+                        is CableSession.SessionState.Processing -> _uiState.value = CableScanUiState.Processing
+                        is CableSession.SessionState.Success -> {
+                            if (!state.wasCreation && !showSuccessOnAuth) {
+                                _autoDone.tryEmit(Unit)
+                                return@callback
+                            }
+                            _uiState.value = CableScanUiState.Success(state.wasCreation)
+                        }
+                        is CableSession.SessionState.Error -> _uiState.value = CableScanUiState.Error(state.message)
+                        else -> {}
                     }
                 }
 

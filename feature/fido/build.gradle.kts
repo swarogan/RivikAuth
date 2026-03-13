@@ -15,6 +15,7 @@ dependencies {
     implementation(libs.zxing.core)
     implementation(project(":core:model"))
     implementation(project(":core:database"))
+    implementation(project(":core:datastore"))
     implementation(project(":core:crypto"))
     implementation("dev.rivik.fido:cable")
     implementation(project(":service:ble"))

@@ -9,6 +9,9 @@
     <string name="setting_auto_lock_desc">Blokuj po przejściu do tła</string>
     <string name="setting_panic_wipe">Panic wipe</string>
     <string name="setting_panic_wipe_desc">Wymaż dane po 10 nieudanych próbach</string>
+    <string name="setting_show_success_on_auth">Ekran potwierdzenia po logowaniu</string>
+    <string name="setting_show_success_on_auth_desc">Pokazuj ekran „Gotowe" po autoryzacji kluczem</string>
+    <string name="section_general">Podstawowe</string>
     <string name="section_appearance">Wygląd</string>
     <string name="setting_dark_theme">Ciemny motyw</string>
     <string name="setting_dark_theme_desc">Użyj ciemnego motywu</string>

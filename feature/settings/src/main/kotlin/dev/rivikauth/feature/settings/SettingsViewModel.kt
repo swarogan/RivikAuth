@@ -45,6 +45,11 @@ class SettingsViewModel @Inject constructor(
                 _uiState.update { it.copy(biometricEnabled = enabled) }
             }
         }
+        viewModelScope.launch {
+            appPrefsStore.showSuccessOnAuth().collect { show ->
+                _uiState.update { it.copy(showSuccessOnAuth = show) }
+            }
+        }
     }
 
     fun requestBiometricEnrollment() {
@@ -90,6 +95,10 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { appPrefsStore.setDarkTheme(enabled) }
     }
     fun setBleEnabled(enabled: Boolean) = _uiState.update { it.copy(bleEnabled = enabled) }
+    fun setShowSuccessOnAuth(enabled: Boolean) {
+        _uiState.update { it.copy(showSuccessOnAuth = enabled) }
+        viewModelScope.launch { appPrefsStore.setShowSuccessOnAuth(enabled) }
+    }
 }
 
 data class SettingsUiState(
@@ -98,4 +107,5 @@ data class SettingsUiState(
     val panicWipeEnabled: Boolean = false,
     val darkTheme: Boolean = true,
     val bleEnabled: Boolean = false,
+    val showSuccessOnAuth: Boolean = true,
 )

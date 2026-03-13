@@ -72,6 +72,11 @@ fun CableScanScreen(
     var cameraPermissionGranted by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
+    // Auto-close on auth without success screen
+    LaunchedEffect(Unit) {
+        viewModel.autoDone.collect { onDone() }
+    }
+
     // Sprawdź BT na starcie
     LaunchedEffect(Unit) { viewModel.checkBluetooth() }
 
