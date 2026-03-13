@@ -146,13 +146,7 @@ fun SettingsScreen(
                     checked = uiState.autoLockEnabled,
                     onCheckedChange = viewModel::setAutoLockEnabled,
                 )
-                SwitchSetting(
-                    icon = Icons.Default.Warning,
-                    title = stringResource(R.string.setting_panic_wipe),
-                    description = stringResource(R.string.setting_panic_wipe_desc),
-                    checked = uiState.panicWipeEnabled,
-                    onCheckedChange = viewModel::setPanicWipeEnabled,
-                )
+
                 SwitchSetting(
                     icon = Icons.Default.Bluetooth,
                     title = stringResource(R.string.setting_ble),

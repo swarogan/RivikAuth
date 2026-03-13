@@ -50,6 +50,21 @@ class SettingsViewModel @Inject constructor(
                 _uiState.update { it.copy(showSuccessOnAuth = show) }
             }
         }
+        viewModelScope.launch {
+            appPrefsStore.autoLock().collect { enabled ->
+                _uiState.update { it.copy(autoLockEnabled = enabled) }
+            }
+        }
+        viewModelScope.launch {
+            appPrefsStore.panicWipe().collect { enabled ->
+                _uiState.update { it.copy(panicWipeEnabled = enabled) }
+            }
+        }
+        viewModelScope.launch {
+            appPrefsStore.bleEnabled().collect { enabled ->
+                _uiState.update { it.copy(bleEnabled = enabled) }
+            }
+        }
     }
 
     fun requestBiometricEnrollment() {
@@ -88,13 +103,22 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun setAutoLockEnabled(enabled: Boolean) = _uiState.update { it.copy(autoLockEnabled = enabled) }
-    fun setPanicWipeEnabled(enabled: Boolean) = _uiState.update { it.copy(panicWipeEnabled = enabled) }
+    fun setAutoLockEnabled(enabled: Boolean) {
+        _uiState.update { it.copy(autoLockEnabled = enabled) }
+        viewModelScope.launch { appPrefsStore.setAutoLock(enabled) }
+    }
+    fun setPanicWipeEnabled(enabled: Boolean) {
+        _uiState.update { it.copy(panicWipeEnabled = enabled) }
+        viewModelScope.launch { appPrefsStore.setPanicWipe(enabled) }
+    }
     fun setDarkTheme(enabled: Boolean) {
         _uiState.update { it.copy(darkTheme = enabled) }
         viewModelScope.launch { appPrefsStore.setDarkTheme(enabled) }
     }
-    fun setBleEnabled(enabled: Boolean) = _uiState.update { it.copy(bleEnabled = enabled) }
+    fun setBleEnabled(enabled: Boolean) {
+        _uiState.update { it.copy(bleEnabled = enabled) }
+        viewModelScope.launch { appPrefsStore.setBleEnabled(enabled) }
+    }
     fun setShowSuccessOnAuth(enabled: Boolean) {
         _uiState.update { it.copy(showSuccessOnAuth = enabled) }
         viewModelScope.launch { appPrefsStore.setShowSuccessOnAuth(enabled) }

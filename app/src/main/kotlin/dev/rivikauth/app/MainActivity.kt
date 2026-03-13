@@ -1,7 +1,10 @@
 package dev.rivikauth.app
 
+import android.content.BroadcastReceiver
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -32,9 +35,13 @@ import dev.rivikauth.app.navigation.RivikBottomBar
 import dev.rivikauth.app.navigation.RivikNavHost
 import dev.rivikauth.app.navigation.Screen
 import dev.rivikauth.app.theme.RivikTheme
+import dev.rivikauth.core.database.di.VaultPassphraseHolder
 import dev.rivikauth.core.datastore.AppPrefsStore
 import dev.rivikauth.core.datastore.VaultSlotStore
 import dev.rivikauth.service.credential.RivikCredentialProviderService
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -47,8 +54,20 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var appPrefsStore: AppPrefsStore
 
+    @Inject
+    lateinit var passphraseHolder: VaultPassphraseHolder
+
     private var showProviderDialog by mutableStateOf(false)
     private var providerCheckDone = false
+    private var lockJob: Job? = null
+
+    private val screenOffReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == Intent.ACTION_SCREEN_OFF) {
+                lockVaultIfNeeded()
+            }
+        }
+    }
 
     private val prefs by lazy {
         getSharedPreferences("rivik_prefs", MODE_PRIVATE)
@@ -57,6 +76,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        registerReceiver(screenOffReceiver, IntentFilter(Intent.ACTION_SCREEN_OFF))
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -139,6 +159,44 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        lockJob?.cancel()
+        lockJob = null
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (passphraseHolder.isUnlocked()) {
+            lockJob = lifecycleScope.launch {
+                val autoLock = appPrefsStore.autoLock().first()
+                if (autoLock) {
+                    delay(AUTO_LOCK_DELAY_MS)
+                    lockVault()
+                }
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(screenOffReceiver)
+    }
+
+    private fun lockVaultIfNeeded() {
+        lifecycleScope.launch {
+            val autoLock = appPrefsStore.autoLock().first()
+            if (autoLock && passphraseHolder.isUnlocked()) {
+                lockVault()
+            }
+        }
+    }
+
+    private fun lockVault() {
+        passphraseHolder.clear()
+        recreate()
+    }
+
     private fun isCredentialProviderEnabled(): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return true
         return try {
@@ -176,5 +234,6 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "MainActivity"
         private const val KEY_PROVIDER_DIALOG_DISMISSED = "provider_dialog_dismissed"
+        private const val AUTO_LOCK_DELAY_MS = 5L * 60 * 1000 // 5 minutes
     }
 }

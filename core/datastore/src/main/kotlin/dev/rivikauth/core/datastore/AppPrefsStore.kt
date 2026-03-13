@@ -22,6 +22,9 @@ class AppPrefsStore @Inject constructor(
         val DARK_THEME = booleanPreferencesKey("dark_theme")
         val BIOMETRIC_ENABLED = booleanPreferencesKey("biometric_enabled")
         val SHOW_SUCCESS_ON_AUTH = booleanPreferencesKey("show_success_on_auth")
+        val AUTO_LOCK = booleanPreferencesKey("auto_lock")
+        val PANIC_WIPE = booleanPreferencesKey("panic_wipe")
+        val BLE_ENABLED = booleanPreferencesKey("ble_enabled")
     }
 
     fun darkTheme(): Flow<Boolean?> =
@@ -43,5 +46,26 @@ class AppPrefsStore @Inject constructor(
 
     suspend fun setShowSuccessOnAuth(enabled: Boolean) {
         context.appPrefsDataStore.edit { it[Keys.SHOW_SUCCESS_ON_AUTH] = enabled }
+    }
+
+    fun autoLock(): Flow<Boolean> =
+        context.appPrefsDataStore.data.map { it[Keys.AUTO_LOCK] ?: true }
+
+    suspend fun setAutoLock(enabled: Boolean) {
+        context.appPrefsDataStore.edit { it[Keys.AUTO_LOCK] = enabled }
+    }
+
+    fun panicWipe(): Flow<Boolean> =
+        context.appPrefsDataStore.data.map { it[Keys.PANIC_WIPE] ?: false }
+
+    suspend fun setPanicWipe(enabled: Boolean) {
+        context.appPrefsDataStore.edit { it[Keys.PANIC_WIPE] = enabled }
+    }
+
+    fun bleEnabled(): Flow<Boolean> =
+        context.appPrefsDataStore.data.map { it[Keys.BLE_ENABLED] ?: false }
+
+    suspend fun setBleEnabled(enabled: Boolean) {
+        context.appPrefsDataStore.edit { it[Keys.BLE_ENABLED] = enabled }
     }
 }
