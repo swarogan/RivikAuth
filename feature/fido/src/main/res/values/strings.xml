@@ -36,4 +36,6 @@
     <string name="cable_bt_off_title">Bluetooth is off</string>
     <string name="cable_bt_off_subtitle">Bluetooth is required for caBLE passkey communication with your computer</string>
     <string name="cable_bt_enable">Open Bluetooth settings</string>
+    <string name="cable_bt_permission_required">Bluetooth permission required</string>
+    <string name="cable_bt_permission_subtitle">Bluetooth Advertise permission is needed for caBLE passkey communication</string>
 </resources>

@@ -36,4 +36,6 @@
     <string name="cable_bt_off_title">Bluetooth wyłączony</string>
     <string name="cable_bt_off_subtitle">Bluetooth jest wymagany do komunikacji caBLE z komputerem</string>
     <string name="cable_bt_enable">Otwórz ustawienia Bluetooth</string>
+    <string name="cable_bt_permission_required">Wymagane uprawnienie Bluetooth</string>
+    <string name="cable_bt_permission_subtitle">Uprawnienie Bluetooth Advertise jest potrzebne do komunikacji caBLE</string>
 </resources>

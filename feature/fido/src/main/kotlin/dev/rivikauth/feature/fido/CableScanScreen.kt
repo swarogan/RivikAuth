@@ -70,6 +70,9 @@ fun CableScanScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var cameraPermissionGranted by remember { mutableStateOf(false) }
+    var btPermissionGranted by remember {
+        mutableStateOf(Build.VERSION.SDK_INT < Build.VERSION_CODES.S)
+    }
     val context = LocalContext.current
 
     // Auto-close on auth without success screen
@@ -85,7 +88,7 @@ fun CableScanScreen(
 
     // Gdy rawUri podany z Scanner — od razu startuj sesję, bez kamery
     LaunchedEffect(rawUri) {
-        if (rawUri.isNotEmpty()) {
+        if (rawUri.isNotEmpty() && btPermissionGranted) {
             viewModel.onQrScanned(rawUri)
         }
     }
@@ -93,24 +96,25 @@ fun CableScanScreen(
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { results ->
-        cameraPermissionGranted = results[Manifest.permission.CAMERA] == true
+        cameraPermissionGranted = results[Manifest.permission.CAMERA] ?: cameraPermissionGranted
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            btPermissionGranted =
+                results[Manifest.permission.BLUETOOTH_ADVERTISE] == true &&
+                results[Manifest.permission.BLUETOOTH_CONNECT] == true
+        }
     }
 
     LaunchedEffect(Unit) {
+        val permissions = mutableListOf<String>()
         if (rawUri.isEmpty()) {
-            val permissions = mutableListOf(Manifest.permission.CAMERA)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                permissions.add(Manifest.permission.BLUETOOTH_ADVERTISE)
-                permissions.add(Manifest.permission.BLUETOOTH_CONNECT)
-            }
+            permissions.add(Manifest.permission.CAMERA)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            permissions.add(Manifest.permission.BLUETOOTH_ADVERTISE)
+            permissions.add(Manifest.permission.BLUETOOTH_CONNECT)
+        }
+        if (permissions.isNotEmpty()) {
             permissionLauncher.launch(permissions.toTypedArray())
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                permissionLauncher.launch(arrayOf(
-                    Manifest.permission.BLUETOOTH_ADVERTISE,
-                    Manifest.permission.BLUETOOTH_CONNECT,
-                ))
-            }
         }
     }
 
@@ -146,7 +150,25 @@ fun CableScanScreen(
                     }
 
                     is CableScanUiState.Scanning -> {
-                        if (cameraPermissionGranted) {
+                        if (!btPermissionGranted) {
+                            StatusView(
+                                icon = { Icon(Icons.Default.BluetoothDisabled, null, Modifier.size(64.dp), tint = MaterialTheme.colorScheme.error) },
+                                title = stringResource(R.string.cable_bt_permission_required),
+                                subtitle = stringResource(R.string.cable_bt_permission_subtitle),
+                                action = {
+                                    Button(onClick = {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                            permissionLauncher.launch(arrayOf(
+                                                Manifest.permission.BLUETOOTH_ADVERTISE,
+                                                Manifest.permission.BLUETOOTH_CONNECT,
+                                            ))
+                                        }
+                                    }) {
+                                        Text(stringResource(R.string.cable_grant_permission))
+                                    }
+                                },
+                            )
+                        } else if (cameraPermissionGranted) {
                             CableCameraPreview(
                                 onQrDetected = { viewModel.onQrScanned(it) },
                             )
