@@ -14,6 +14,8 @@ A modern, privacy-focused Android authenticator combining **OTP** and **FIDO2/Pa
 - Android Credential Provider Service (API 34+)
 - Create and authenticate with passkeys
 - caBLE v2 hybrid transport — scan a QR code on a desktop browser and authenticate via Bluetooth
+- Linked device sessions — pair once, reconnect without QR on subsequent authentications
+- NFC security key — use phone as FIDO2 NFC authenticator via HCE
 - CTAP2 protocol, self-attestation
 
 ### Security
@@ -61,7 +63,8 @@ core/
   └── datastore/        → Preferences, vault slot storage
 service/
   ├── credential/       → CredentialProviderService (FIDO2/WebAuthn)
-  └── ble/              → BLE HID, caBLE v2 advertiser, CTAP command handler
+  ├── ble/              → BLE HID, caBLE v2 advertiser, CTAP command handler
+  └── nfc/              → NFC HCE service — FIDO2 NFC security key transport
 lib/
   ├── webauthn/         → COSE keys, AuthenticatorData, CTAP HID framing
   ├── attestation/      → Packed & None attestation

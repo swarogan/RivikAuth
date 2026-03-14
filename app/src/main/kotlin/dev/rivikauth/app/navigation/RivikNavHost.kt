@@ -22,6 +22,7 @@ import dev.rivikauth.feature.vault.UnlockScreen
 fun RivikNavHost(
     navController: NavHostController,
     isVaultCreated: Boolean,
+    onLockVault: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -82,7 +83,8 @@ fun RivikNavHost(
         }
         composable<Screen.Settings> {
             SettingsScreen(
-                onNavigateToImportExport = { navController.navigate(Screen.ImportExport) }
+                onNavigateToImportExport = { navController.navigate(Screen.ImportExport) },
+                onLockVault = onLockVault,
             )
         }
         composable<Screen.About> {

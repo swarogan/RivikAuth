@@ -5,8 +5,9 @@
     <string name="section_security">Bezpieczeństwo</string>
     <string name="setting_biometric">Biometria</string>
     <string name="setting_biometric_desc">Odblokuj vault odciskiem palca</string>
+    <string name="setting_lock_vault">Zablokuj vault</string>
     <string name="setting_auto_lock">Auto-lock</string>
-    <string name="setting_auto_lock_desc">Blokuj po przejściu do tła</string>
+    <string name="setting_auto_lock_desc">Blokuj po 5 minutach bezczynności</string>
     <string name="setting_panic_wipe">Panic wipe</string>
     <string name="setting_panic_wipe_desc">Wymaż dane po 10 nieudanych próbach</string>
     <string name="setting_show_success_on_auth">Ekran potwierdzenia po logowaniu</string>

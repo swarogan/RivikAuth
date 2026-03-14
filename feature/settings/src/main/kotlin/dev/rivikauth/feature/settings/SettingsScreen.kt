@@ -27,6 +27,7 @@ import dev.rivikauth.core.crypto.BiometricUnlockManager
 @Composable
 fun SettingsScreen(
     onNavigateToImportExport: () -> Unit = {},
+    onLockVault: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -69,7 +70,17 @@ fun SettingsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(stringResource(R.string.settings_title)) })
+            TopAppBar(
+                title = { Text(stringResource(R.string.settings_title)) },
+                actions = {
+                    IconButton(onClick = onLockVault) {
+                        Icon(
+                            Icons.Default.Lock,
+                            contentDescription = stringResource(R.string.setting_lock_vault),
+                        )
+                    }
+                },
+            )
         },
     ) { padding ->
         Column(
@@ -153,8 +164,14 @@ fun SettingsScreen(
                     title = stringResource(R.string.setting_ble),
                     description = stringResource(R.string.setting_ble_desc),
                     checked = uiState.bleEnabled,
-                    onCheckedChange = {},
-                    enabled = false,
+                    onCheckedChange = { enabled ->
+                        viewModel.setBleEnabled(enabled)
+                        if (enabled) {
+                            dev.rivikauth.service.ble.LinkedDeviceService.start(context)
+                        } else {
+                            dev.rivikauth.service.ble.LinkedDeviceService.stop(context)
+                        }
+                    },
                 )
 
                 SwitchSetting(
@@ -162,14 +179,8 @@ fun SettingsScreen(
                     title = stringResource(R.string.setting_linked_device),
                     description = stringResource(R.string.setting_linked_device_desc),
                     checked = uiState.linkedDeviceEnabled,
-                    onCheckedChange = { enabled ->
-                        viewModel.setLinkedDeviceEnabled(enabled)
-                        if (enabled) {
-                            dev.rivikauth.service.ble.LinkedDeviceService.start(context)
-                        } else {
-                            dev.rivikauth.service.ble.LinkedDeviceService.stop(context)
-                        }
-                    },
+                    onCheckedChange = {},
+                    enabled = false,
                 )
 
                 val hasNfc = remember {

@@ -21,6 +21,7 @@ includeBuild("../rivik-fido-sdk") {
         substitute(module("dev.rivik.fido:attestation")).using(project(":attestation"))
         substitute(module("dev.rivik.fido:cable")).using(project(":cable"))
         substitute(module("dev.rivik.fido:crypto")).using(project(":crypto"))
+        substitute(module("dev.rivik.fido:nfc")).using(project(":nfc"))
     }
 }
 

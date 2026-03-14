@@ -40,22 +40,22 @@ class LinkedDeviceService : Service() {
             return START_NOT_STICKY
         }
 
+        startForeground(NOTIFICATION_ID, buildNotification())
+
         if (!passphraseHolder.isUnlocked()) {
             Log.w(TAG, "Vault locked, cannot start")
             stopSelf()
             return START_NOT_STICKY
         }
 
-        val linkedEnabled = kotlinx.coroutines.runBlocking {
-            appPrefsStore.linkedDeviceEnabled().first()
+        val bleEnabled = kotlinx.coroutines.runBlocking {
+            appPrefsStore.bleEnabled().first()
         }
-        if (!linkedEnabled) {
+        if (!bleEnabled) {
             Log.d(TAG, "BLE authenticator disabled in settings")
             stopSelf()
             return START_NOT_STICKY
         }
-
-        startForeground(NOTIFICATION_ID, buildNotification())
 
         val processor = CtapProcessor(
             credentialStore,

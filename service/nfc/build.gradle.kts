@@ -8,4 +8,5 @@ dependencies {
     implementation(project(":core:datastore"))
     implementation("dev.rivik.fido:webauthn")
     implementation("dev.rivik.fido:cable")
+    implementation("dev.rivik.fido:nfc")
 }

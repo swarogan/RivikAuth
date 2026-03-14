@@ -61,7 +61,6 @@ class MainActivity : AppCompatActivity() {
     private var inactivityJob: Job? = null
     private var autoLockCached = true
     private var lockGeneration by mutableIntStateOf(0)
-    private var lockDelayJob: Job? = null
 
     private val prefs by lazy {
         getSharedPreferences("rivik_prefs", MODE_PRIVATE)
@@ -144,6 +143,10 @@ class MainActivity : AppCompatActivity() {
                             RivikNavHost(
                                 navController = navController,
                                 isVaultCreated = vaultCreated,
+                                onLockVault = {
+                                    passphraseHolder.clear()
+                                    lockGeneration++
+                                },
                                 modifier = Modifier.padding(padding),
                             )
                         }
@@ -155,8 +158,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        lockDelayJob?.cancel()
-        lockDelayJob = null
         if (autoLockCached && !passphraseHolder.isUnlocked()) {
             lockGeneration++
         }
@@ -165,15 +166,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        inactivityJob?.cancel()
-        inactivityJob = null
-        if (autoLockCached && passphraseHolder.isUnlocked()) {
-            lockDelayJob?.cancel()
-            lockDelayJob = lifecycleScope.launch {
-                delay(LOCK_DELAY_MS)
-                passphraseHolder.clear()
-            }
-        }
+        // Nie lockujemy w tle — BLE authenticator musi działać.
+        // Lock tylko przez inactivity timer lub ręcznie.
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
@@ -230,7 +224,6 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "MainActivity"
         private const val KEY_PROVIDER_DIALOG_DISMISSED = "provider_dialog_dismissed"
         private const val INACTIVITY_TIMEOUT_MS = 5L * 60 * 1000 // 5 minutes
-        private const val LOCK_DELAY_MS = 60_000L // lock after 60s in background
 
         private val BOTTOM_BAR_SCREENS = listOf(
             Screen.OtpList::class, Screen.FidoList::class, Screen.Scanner::class,
