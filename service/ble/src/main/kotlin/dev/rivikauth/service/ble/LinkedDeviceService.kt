@@ -13,15 +13,10 @@ import androidx.core.app.NotificationCompat
 import dagger.hilt.android.AndroidEntryPoint
 import dev.rivikauth.core.database.di.VaultPassphraseHolder
 import dev.rivikauth.core.datastore.AppPrefsStore
+import dev.rivikauth.lib.ble.FidoBleGattServer
 import dev.rivikauth.lib.cable.AuthenticatorConfig
-import dev.rivikauth.lib.cable.CableLinkedListener
 import dev.rivikauth.lib.cable.CtapProcessor
 import dev.rivikauth.lib.cable.FidoCredentialStore
-import dev.rivikauth.lib.cable.LinkedDeviceStore
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
@@ -29,12 +24,10 @@ import javax.inject.Inject
 class LinkedDeviceService : Service() {
 
     @Inject lateinit var credentialStore: FidoCredentialStore
-    @Inject lateinit var linkedDeviceStore: LinkedDeviceStore
     @Inject lateinit var passphraseHolder: VaultPassphraseHolder
     @Inject lateinit var appPrefsStore: AppPrefsStore
 
-    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private var listener: CableLinkedListener? = null
+    private var gattServer: FidoBleGattServer? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -48,7 +41,7 @@ class LinkedDeviceService : Service() {
         }
 
         if (!passphraseHolder.isUnlocked()) {
-            Log.w(TAG, "Vault locked, cannot start listener")
+            Log.w(TAG, "Vault locked, cannot start")
             stopSelf()
             return START_NOT_STICKY
         }
@@ -57,7 +50,7 @@ class LinkedDeviceService : Service() {
             appPrefsStore.linkedDeviceEnabled().first()
         }
         if (!linkedEnabled) {
-            Log.d(TAG, "Linked device disabled in settings")
+            Log.d(TAG, "BLE authenticator disabled in settings")
             stopSelf()
             return START_NOT_STICKY
         }
@@ -69,38 +62,28 @@ class LinkedDeviceService : Service() {
             passphraseHolder.getPassphrase(),
             AuthenticatorConfig(
                 extensions = listOf("credProtect", "hmac-secret", "largeBlobKey"),
+                transports = listOf("ble"),
             ),
         )
-        val bleAdvertiser = CableBleAdvertiser(this)
 
-        val linkedListener = CableLinkedListener(
-            ctapProcessor = processor,
-            bleAdvertiser = bleAdvertiser,
-            linkedDeviceStore = linkedDeviceStore,
-        )
-        linkedListener.onEvent = { event ->
-            when (event) {
-                is CableLinkedListener.Event.SessionCompleted -> {
-                    Log.d(TAG, "Session completed: creation=${event.wasCreation}")
-                }
-                is CableLinkedListener.Event.SessionFailed -> {
-                    Log.w(TAG, "Session failed: ${event.message}")
-                }
-                is CableLinkedListener.Event.TunnelReconnecting -> {
-                    Log.d(TAG, "Reconnecting device ${event.deviceIndex}, attempt ${event.attempt}")
-                }
-            }
+        val server = FidoBleGattServer(this, processor)
+        server.onStateChanged = { state ->
+            Log.d(TAG, "BLE GATT: $state")
         }
-        listener = linkedListener
-        linkedListener.start(serviceScope)
+        try {
+            server.start()
+            gattServer = server
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start GATT server", e)
+            stopSelf()
+        }
 
         return START_STICKY
     }
 
     override fun onDestroy() {
-        listener?.stop()
-        listener = null
-        serviceScope.cancel()
+        gattServer?.stop()
+        gattServer = null
         super.onDestroy()
     }
 
@@ -109,10 +92,10 @@ class LinkedDeviceService : Service() {
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
             CHANNEL_ID,
-            "Linked Device Listener",
+            "FIDO BLE Authenticator",
             NotificationManager.IMPORTANCE_LOW,
         ).apply {
-            description = "Authenticator nasłuchuje na sparowane urządzenia"
+            description = "Authenticator BLE aktywny"
         }
         getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
     }
@@ -136,8 +119,8 @@ class LinkedDeviceService : Service() {
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_lock_idle_lock)
-            .setContentTitle("RivikAuth aktywny")
-            .setContentText("Nasłuchiwanie na sparowane urządzenia")
+            .setContentTitle("RivikAuth BLE")
+            .setContentText("Authenticator BLE aktywny")
             .setContentIntent(contentPi)
             .addAction(android.R.drawable.ic_delete, "Zatrzymaj", stopPi)
             .setOngoing(true)
