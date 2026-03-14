@@ -72,7 +72,7 @@ class AndOtpImporter : Importer {
         val counter = entry.optLong("counter", 0L)
 
         return OtpEntry(
-            id = UUID.randomUUID().toString(),
+            id = stableEntryId(issuer, label, secret),
             name = label,
             issuer = issuer,
             type = type,

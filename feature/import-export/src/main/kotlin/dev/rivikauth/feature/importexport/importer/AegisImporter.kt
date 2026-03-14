@@ -85,8 +85,11 @@ class AegisImporter : Importer {
         val counter = info.optLong("counter", 0L)
         val pin = info.optString("pin", "").ifBlank { null }
 
+        val aegisUuid = entry.optString("uuid", "").ifBlank { null }
+        val id = aegisUuid ?: UUID.randomUUID().toString()
+
         return OtpEntry(
-            id = UUID.randomUUID().toString(),
+            id = id,
             name = name,
             issuer = issuer,
             type = type,

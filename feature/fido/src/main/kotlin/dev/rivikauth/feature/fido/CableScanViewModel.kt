@@ -11,8 +11,10 @@ import dev.rivikauth.core.database.di.VaultPassphraseHolder
 import dev.rivikauth.core.datastore.AppPrefsStore
 import dev.rivikauth.lib.cable.CableQrCode
 import dev.rivikauth.lib.cable.CableSession
+import dev.rivikauth.lib.cable.CableSessionMode
 import dev.rivikauth.lib.cable.CtapProcessor
 import dev.rivikauth.lib.cable.FidoCredentialStore
+import dev.rivikauth.lib.cable.LinkedDeviceStore
 import dev.rivikauth.service.ble.CableBleAdvertiser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -40,6 +42,7 @@ sealed interface CableScanUiState {
 class CableScanViewModel @Inject constructor(
     application: Application,
     private val credentialStore: FidoCredentialStore,
+    private val linkedDeviceStore: LinkedDeviceStore,
     private val passphraseHolder: VaultPassphraseHolder,
     private val appPrefsStore: AppPrefsStore,
 ) : AndroidViewModel(application) {
@@ -98,7 +101,12 @@ class CableScanViewModel @Inject constructor(
                 val ctapProcessor = CtapProcessor(credentialStore, masterKeyBytes)
                 val bleAdvertiser = CableBleAdvertiser(getApplication())
 
-                val session = CableSession(qrData, ctapProcessor, bleAdvertiser)
+                val session = CableSession(
+                    CableSessionMode.Qr(qrData),
+                    ctapProcessor,
+                    bleAdvertiser,
+                    linkedDeviceStore = linkedDeviceStore,
+                )
                 session.onStateChanged = callback@{ state ->
                     when (state) {
                         is CableSession.SessionState.Advertising -> _uiState.value = CableScanUiState.Advertising

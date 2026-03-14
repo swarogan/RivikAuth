@@ -75,7 +75,7 @@ class TwoFASImporter : Importer {
         val counter = otp.optLong("counter", 0L)
 
         return OtpEntry(
-            id = UUID.randomUUID().toString(),
+            id = stableEntryId(issuer, account, Base32.decode(secretBase32)),
             name = account,
             issuer = issuer,
             type = type,

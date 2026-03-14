@@ -61,6 +61,7 @@ class MainActivity : AppCompatActivity() {
     private var inactivityJob: Job? = null
     private var autoLockCached = true
     private var lockGeneration by mutableIntStateOf(0)
+    private var lockDelayJob: Job? = null
 
     private val prefs by lazy {
         getSharedPreferences("rivik_prefs", MODE_PRIVATE)
@@ -154,6 +155,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        lockDelayJob?.cancel()
+        lockDelayJob = null
         if (autoLockCached && !passphraseHolder.isUnlocked()) {
             lockGeneration++
         }
@@ -165,7 +168,11 @@ class MainActivity : AppCompatActivity() {
         inactivityJob?.cancel()
         inactivityJob = null
         if (autoLockCached && passphraseHolder.isUnlocked()) {
-            passphraseHolder.clear()
+            lockDelayJob?.cancel()
+            lockDelayJob = lifecycleScope.launch {
+                delay(LOCK_DELAY_MS)
+                passphraseHolder.clear()
+            }
         }
     }
 
@@ -223,6 +230,7 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "MainActivity"
         private const val KEY_PROVIDER_DIALOG_DISMISSED = "provider_dialog_dismissed"
         private const val INACTIVITY_TIMEOUT_MS = 5L * 60 * 1000 // 5 minutes
+        private const val LOCK_DELAY_MS = 60_000L // lock after 60s in background
 
         private val BOTTOM_BAR_SCREENS = listOf(
             Screen.OtpList::class, Screen.FidoList::class, Screen.Scanner::class,

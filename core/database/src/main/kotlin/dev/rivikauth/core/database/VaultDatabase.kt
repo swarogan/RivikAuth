@@ -6,13 +6,20 @@ import androidx.room.TypeConverters
 import dev.rivikauth.core.database.dao.OtpEntryDao
 import dev.rivikauth.core.database.dao.FidoCredentialDao
 import dev.rivikauth.core.database.dao.EntryGroupDao
+import dev.rivikauth.core.database.dao.LinkedPairingDao
 import dev.rivikauth.core.database.entity.OtpEntryEntity
 import dev.rivikauth.core.database.entity.FidoCredentialEntity
 import dev.rivikauth.core.database.entity.EntryGroupEntity
+import dev.rivikauth.core.database.entity.LinkedPairingEntity
 
 @Database(
-    entities = [OtpEntryEntity::class, FidoCredentialEntity::class, EntryGroupEntity::class],
-    version = 2,
+    entities = [
+        OtpEntryEntity::class,
+        FidoCredentialEntity::class,
+        EntryGroupEntity::class,
+        LinkedPairingEntity::class,
+    ],
+    version = 3,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
@@ -20,4 +27,5 @@ abstract class VaultDatabase : RoomDatabase() {
     abstract fun otpEntryDao(): OtpEntryDao
     abstract fun fidoCredentialDao(): FidoCredentialDao
     abstract fun entryGroupDao(): EntryGroupDao
+    abstract fun linkedPairingDao(): LinkedPairingDao
 }

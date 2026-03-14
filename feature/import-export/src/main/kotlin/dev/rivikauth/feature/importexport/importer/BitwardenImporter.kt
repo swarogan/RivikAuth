@@ -75,7 +75,7 @@ class BitwardenImporter : Importer {
         username: String,
     ): OtpEntry {
         return OtpEntry(
-            id = UUID.randomUUID().toString(),
+            id = stableEntryId(itemName, username.ifBlank { itemName }, Base32.decode(secret)),
             name = username.ifBlank { itemName },
             issuer = itemName,
             type = OtpType.TOTP,
