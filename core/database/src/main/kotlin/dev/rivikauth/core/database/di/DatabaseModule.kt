@@ -2,6 +2,7 @@ package dev.rivikauth.core.database.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.sqlite.db.SupportSQLiteOpenHelper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,9 +31,11 @@ object DatabaseModule {
         passphraseProvider: DatabasePassphraseProvider,
     ): VaultDatabase {
         System.loadLibrary("sqlcipher")
-        val factory = SupportOpenHelperFactory(passphraseProvider.getPassphrase())
+        val lazyFactory = SupportSQLiteOpenHelper.Factory { config ->
+            SupportOpenHelperFactory(passphraseProvider.getPassphrase()).create(config)
+        }
         return Room.databaseBuilder(context, VaultDatabase::class.java, "vault.db")
-            .openHelperFactory(factory)
+            .openHelperFactory(lazyFactory)
             .fallbackToDestructiveMigration()
             .build()
     }

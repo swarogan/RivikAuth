@@ -20,6 +20,8 @@
     <string name="section_bluetooth">Bluetooth</string>
     <string name="setting_ble">BLE Authenticator</string>
     <string name="setting_ble_desc">Działaj jako FIDO2 roaming authenticator</string>
+    <string name="setting_linked_device">Linked device</string>
+    <string name="setting_linked_device_desc">Zapamiętuj sparowane przeglądarki do szybszego połączenia bez QR</string>
     <string name="section_data">Dane</string>
     <string name="setting_import_export">Import / Eksport</string>
     <string name="setting_import_export_desc">Importuj lub eksportuj dane</string>

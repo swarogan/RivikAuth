@@ -26,6 +26,7 @@ class AppPrefsStore @Inject constructor(
         val PANIC_WIPE = booleanPreferencesKey("panic_wipe")
         val BLE_ENABLED = booleanPreferencesKey("ble_enabled")
         val NFC_ENABLED = booleanPreferencesKey("nfc_enabled")
+        val LINKED_DEVICE_ENABLED = booleanPreferencesKey("linked_device_enabled")
     }
 
     fun darkTheme(): Flow<Boolean?> =
@@ -75,5 +76,12 @@ class AppPrefsStore @Inject constructor(
 
     suspend fun setNfcEnabled(enabled: Boolean) {
         context.appPrefsDataStore.edit { it[Keys.NFC_ENABLED] = enabled }
+    }
+
+    fun linkedDeviceEnabled(): Flow<Boolean> =
+        context.appPrefsDataStore.data.map { it[Keys.LINKED_DEVICE_ENABLED] ?: false }
+
+    suspend fun setLinkedDeviceEnabled(enabled: Boolean) {
+        context.appPrefsDataStore.edit { it[Keys.LINKED_DEVICE_ENABLED] = enabled }
     }
 }

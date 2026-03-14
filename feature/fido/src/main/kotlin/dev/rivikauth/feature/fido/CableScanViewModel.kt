@@ -101,11 +101,13 @@ class CableScanViewModel @Inject constructor(
                 val ctapProcessor = CtapProcessor(credentialStore, masterKeyBytes)
                 val bleAdvertiser = CableBleAdvertiser(getApplication())
 
+                val linkedEnabled = appPrefsStore.linkedDeviceEnabled().first()
+
                 val session = CableSession(
                     CableSessionMode.Qr(qrData),
                     ctapProcessor,
                     bleAdvertiser,
-                    linkedDeviceStore = linkedDeviceStore,
+                    linkedDeviceStore = if (linkedEnabled) linkedDeviceStore else null,
                 )
                 session.onStateChanged = callback@{ state ->
                     when (state) {

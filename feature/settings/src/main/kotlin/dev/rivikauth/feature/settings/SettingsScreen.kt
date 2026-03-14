@@ -157,6 +157,14 @@ fun SettingsScreen(
                     enabled = false,
                 )
 
+                SwitchSetting(
+                    icon = Icons.Default.Link,
+                    title = stringResource(R.string.setting_linked_device),
+                    description = stringResource(R.string.setting_linked_device_desc),
+                    checked = uiState.linkedDeviceEnabled,
+                    onCheckedChange = viewModel::setLinkedDeviceEnabled,
+                )
+
                 val hasNfc = remember {
                     val nfcManager = context.getSystemService(NfcManager::class.java)
                     nfcManager?.defaultAdapter != null
