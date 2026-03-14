@@ -38,4 +38,11 @@
     <string name="cable_bt_enable">Open Bluetooth settings</string>
     <string name="cable_bt_permission_required">Bluetooth permission required</string>
     <string name="cable_bt_permission_subtitle">Bluetooth Advertise permission is needed for caBLE passkey communication</string>
+
+    <!-- CTAP errors -->
+    <string name="ctap_err_no_credentials">No registered key for this site</string>
+    <string name="ctap_err_credential_excluded">Key already registered for this site</string>
+    <string name="ctap_err_operation_denied">Operation denied</string>
+    <string name="ctap_err_invalid_cbor">Invalid request from site</string>
+    <string name="ctap_err_unknown">Authenticator error (0x%1$s)</string>
 </resources>

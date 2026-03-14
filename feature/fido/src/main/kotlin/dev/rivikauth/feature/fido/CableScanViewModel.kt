@@ -12,6 +12,7 @@ import dev.rivikauth.core.datastore.AppPrefsStore
 import dev.rivikauth.lib.cable.CableQrCode
 import dev.rivikauth.lib.cable.CableSession
 import dev.rivikauth.lib.cable.CableSessionMode
+import dev.rivikauth.lib.cable.AuthenticatorConfig
 import dev.rivikauth.lib.cable.CtapProcessor
 import dev.rivikauth.lib.cable.FidoCredentialStore
 import dev.rivikauth.lib.cable.LinkedDeviceStore
@@ -98,7 +99,13 @@ class CableScanViewModel @Inject constructor(
 
                 val showSuccessOnAuth = appPrefsStore.showSuccessOnAuth().first()
 
-                val ctapProcessor = CtapProcessor(credentialStore, masterKeyBytes)
+                val ctapProcessor = CtapProcessor(
+                    credentialStore,
+                    masterKeyBytes,
+                    AuthenticatorConfig(
+                        extensions = listOf("credProtect", "hmac-secret", "largeBlobKey"),
+                    ),
+                )
                 val bleAdvertiser = CableBleAdvertiser(getApplication())
 
                 val linkedEnabled = appPrefsStore.linkedDeviceEnabled().first()
@@ -122,7 +129,12 @@ class CableScanViewModel @Inject constructor(
                             }
                             _uiState.value = CableScanUiState.Success(state.wasCreation)
                         }
-                        is CableSession.SessionState.Error -> _uiState.value = CableScanUiState.Error(state.message)
+                        is CableSession.SessionState.Error -> {
+                            val msg = state.ctapErrorCode?.let { code ->
+                                ctapErrorToString(code)
+                            } ?: state.message
+                            _uiState.value = CableScanUiState.Error(msg)
+                        }
                         else -> {}
                     }
                 }
@@ -142,6 +154,22 @@ class CableScanViewModel @Inject constructor(
         _uiState.value = CableScanUiState.Scanning
         sessionStarted = false
         pendingQrValue = null
+    }
+
+    private fun ctapErrorToString(code: Byte): String {
+        val app = getApplication<Application>()
+        return when (code) {
+            dev.rivikauth.lib.cable.CableConstants.CTAP2_ERR_NO_CREDENTIALS ->
+                app.getString(R.string.ctap_err_no_credentials)
+            dev.rivikauth.lib.cable.CableConstants.CTAP2_ERR_CREDENTIAL_EXCLUDED ->
+                app.getString(R.string.ctap_err_credential_excluded)
+            dev.rivikauth.lib.cable.CableConstants.CTAP2_ERR_OPERATION_DENIED ->
+                app.getString(R.string.ctap_err_operation_denied)
+            dev.rivikauth.lib.cable.CableConstants.CTAP2_ERR_INVALID_CBOR ->
+                app.getString(R.string.ctap_err_invalid_cbor)
+            else ->
+                app.getString(R.string.ctap_err_unknown, code.toUByte().toString(16))
+        }
     }
 
     companion object {

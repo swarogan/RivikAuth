@@ -26,6 +26,9 @@ class RoomFidoCredentialStore @Inject constructor(
                 createdAt = credential.createdAt,
                 lastUsedAt = credential.lastUsedAt,
                 encryptedPrivateKey = credential.encryptedPrivateKey,
+                credProtectPolicy = credential.credProtectPolicy,
+                encryptedCredRandom = credential.encryptedCredRandom,
+                encryptedLargeBlobKey = credential.encryptedLargeBlobKey,
             )
         )
     }
@@ -51,5 +54,8 @@ class RoomFidoCredentialStore @Inject constructor(
         createdAt = createdAt,
         lastUsedAt = lastUsedAt,
         encryptedPrivateKey = encryptedPrivateKey,
+        credProtectPolicy = credProtectPolicy,
+        encryptedCredRandom = encryptedCredRandom,
+        encryptedLargeBlobKey = encryptedLargeBlobKey,
     )
 }

@@ -19,4 +19,7 @@ data class FidoCredentialEntity(
     val createdAt: Long,
     val lastUsedAt: Long,
     val encryptedPrivateKey: ByteArray? = null,
+    val credProtectPolicy: Int = 1,
+    val encryptedCredRandom: ByteArray? = null,
+    val encryptedLargeBlobKey: ByteArray? = null,
 )

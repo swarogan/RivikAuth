@@ -23,4 +23,5 @@ dependencies {
     implementation(project(":core:crypto"))
     implementation(project(":core:database"))
     implementation(project(":core:model"))
+    implementation(project(":service:ble"))
 }

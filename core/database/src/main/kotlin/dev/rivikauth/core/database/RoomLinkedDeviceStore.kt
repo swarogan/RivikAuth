@@ -60,6 +60,15 @@ class RoomLinkedDeviceStore @Inject constructor(
         dao.deleteByContactId(contactId)
     }
 
+    override suspend fun listAll(): List<LinkedClientData> =
+        dao.getAll().map { entity ->
+            LinkedClientData(
+                contactId = entity.contactId,
+                pairedSecret = entity.pairedSecret,
+                identityPublicKey = entity.peerIdentityKey,
+            )
+        }
+
     private fun generateIdentityKeyPair(): KeyPair {
         val spec = KeyGenParameterSpec.Builder(
             IDENTITY_ALIAS,

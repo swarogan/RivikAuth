@@ -1,7 +1,9 @@
 package dev.rivikauth.app.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,6 +24,7 @@ fun RivikNavHost(
     isVaultCreated: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val startDestination: Screen = if (isVaultCreated) Screen.Unlock else Screen.Setup
 
     NavHost(
@@ -44,6 +47,8 @@ fun RivikNavHost(
                     navController.navigate(Screen.OtpList) {
                         popUpTo(Screen.Unlock) { inclusive = true }
                     }
+                    // Auto-start linked device listener if enabled
+                    dev.rivikauth.service.ble.LinkedDeviceService.start(context)
                 }
             )
         }

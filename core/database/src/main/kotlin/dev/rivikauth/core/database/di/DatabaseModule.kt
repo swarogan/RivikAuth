@@ -36,7 +36,8 @@ object DatabaseModule {
         }
         return Room.databaseBuilder(context, VaultDatabase::class.java, "vault.db")
             .openHelperFactory(lazyFactory)
-            .fallbackToDestructiveMigration()
+            .addMigrations(VaultDatabase.MIGRATION_3_4)
+            .fallbackToDestructiveMigration(dropAllTables = true)
             .build()
     }
 

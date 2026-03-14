@@ -162,7 +162,14 @@ fun SettingsScreen(
                     title = stringResource(R.string.setting_linked_device),
                     description = stringResource(R.string.setting_linked_device_desc),
                     checked = uiState.linkedDeviceEnabled,
-                    onCheckedChange = viewModel::setLinkedDeviceEnabled,
+                    onCheckedChange = { enabled ->
+                        viewModel.setLinkedDeviceEnabled(enabled)
+                        if (enabled) {
+                            dev.rivikauth.service.ble.LinkedDeviceService.start(context)
+                        } else {
+                            dev.rivikauth.service.ble.LinkedDeviceService.stop(context)
+                        }
+                    },
                 )
 
                 val hasNfc = remember {

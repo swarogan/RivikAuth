@@ -38,4 +38,11 @@
     <string name="cable_bt_enable">Otwórz ustawienia Bluetooth</string>
     <string name="cable_bt_permission_required">Wymagane uprawnienie Bluetooth</string>
     <string name="cable_bt_permission_subtitle">Uprawnienie Bluetooth Advertise jest potrzebne do komunikacji caBLE</string>
+
+    <!-- CTAP errors -->
+    <string name="ctap_err_no_credentials">Brak zarejestrowanego klucza dla tej strony</string>
+    <string name="ctap_err_credential_excluded">Klucz już zarejestrowany dla tej strony</string>
+    <string name="ctap_err_operation_denied">Operacja odrzucona</string>
+    <string name="ctap_err_invalid_cbor">Nieprawidłowe żądanie od strony</string>
+    <string name="ctap_err_unknown">Błąd authenticatora (0x%1$s)</string>
 </resources>

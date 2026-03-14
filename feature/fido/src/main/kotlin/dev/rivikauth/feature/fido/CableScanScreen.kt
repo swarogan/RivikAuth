@@ -69,11 +69,22 @@ fun CableScanScreen(
     viewModel: CableScanViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var cameraPermissionGranted by remember { mutableStateOf(false) }
-    var btPermissionGranted by remember {
-        mutableStateOf(Build.VERSION.SDK_INT < Build.VERSION_CODES.S)
-    }
     val context = LocalContext.current
+    var cameraPermissionGranted by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                android.content.pm.PackageManager.PERMISSION_GRANTED
+        )
+    }
+    var btPermissionGranted by remember {
+        mutableStateOf(
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+            (ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADVERTISE) ==
+                android.content.pm.PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) ==
+                android.content.pm.PackageManager.PERMISSION_GRANTED)
+        )
+    }
 
     // Auto-close on auth without success screen
     LaunchedEffect(Unit) {
@@ -106,10 +117,10 @@ fun CableScanScreen(
 
     LaunchedEffect(Unit) {
         val permissions = mutableListOf<String>()
-        if (rawUri.isEmpty()) {
+        if (rawUri.isEmpty() && !cameraPermissionGranted) {
             permissions.add(Manifest.permission.CAMERA)
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !btPermissionGranted) {
             permissions.add(Manifest.permission.BLUETOOTH_ADVERTISE)
             permissions.add(Manifest.permission.BLUETOOTH_CONNECT)
         }

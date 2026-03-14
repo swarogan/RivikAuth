@@ -17,4 +17,7 @@ interface LinkedPairingDao {
 
     @Query("DELETE FROM linked_pairings WHERE contactId = :contactId")
     suspend fun deleteByContactId(contactId: ByteArray)
+
+    @Query("SELECT * FROM linked_pairings")
+    suspend fun getAll(): List<LinkedPairingEntity>
 }
