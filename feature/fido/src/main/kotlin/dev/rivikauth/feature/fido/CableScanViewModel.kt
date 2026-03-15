@@ -56,6 +56,7 @@ class CableScanViewModel @Inject constructor(
 
     private var sessionStarted = false
     private var pendingQrValue: String? = null
+    private var activeSession: CableSession? = null
 
     fun checkBluetooth() {
         val btManager = getApplication<Application>()
@@ -116,26 +117,30 @@ class CableScanViewModel @Inject constructor(
                     bleAdvertiser,
                     linkedDeviceStore = if (linkedEnabled) linkedDeviceStore else null,
                 )
-                session.onStateChanged = callback@{ state ->
-                    when (state) {
-                        is CableSession.SessionState.Advertising -> _uiState.value = CableScanUiState.Advertising
-                        is CableSession.SessionState.Connecting -> _uiState.value = CableScanUiState.Connecting
-                        is CableSession.SessionState.Handshaking -> _uiState.value = CableScanUiState.Handshaking
-                        is CableSession.SessionState.Processing -> _uiState.value = CableScanUiState.Processing
-                        is CableSession.SessionState.Success -> {
-                            if (!state.wasCreation && !showSuccessOnAuth) {
-                                _autoDone.tryEmit(Unit)
-                                return@callback
+                activeSession = session
+
+                launch {
+                    session.state.collect { state ->
+                        when (state) {
+                            is CableSession.SessionState.Advertising -> _uiState.value = CableScanUiState.Advertising
+                            is CableSession.SessionState.Connecting -> _uiState.value = CableScanUiState.Connecting
+                            is CableSession.SessionState.Handshaking -> _uiState.value = CableScanUiState.Handshaking
+                            is CableSession.SessionState.Processing -> _uiState.value = CableScanUiState.Processing
+                            is CableSession.SessionState.Success -> {
+                                if (!state.wasCreation && !showSuccessOnAuth) {
+                                    _autoDone.tryEmit(Unit)
+                                    return@collect
+                                }
+                                _uiState.value = CableScanUiState.Success(state.wasCreation)
                             }
-                            _uiState.value = CableScanUiState.Success(state.wasCreation)
+                            is CableSession.SessionState.Error -> {
+                                val msg = state.ctapErrorCode?.let { code ->
+                                    ctapErrorToString(code)
+                                } ?: state.message
+                                _uiState.value = CableScanUiState.Error(msg)
+                            }
+                            is CableSession.SessionState.Idle -> {}
                         }
-                        is CableSession.SessionState.Error -> {
-                            val msg = state.ctapErrorCode?.let { code ->
-                                ctapErrorToString(code)
-                            } ?: state.message
-                            _uiState.value = CableScanUiState.Error(msg)
-                        }
-                        else -> {}
                     }
                 }
 
@@ -151,6 +156,8 @@ class CableScanViewModel @Inject constructor(
     }
 
     fun resetState() {
+        activeSession?.cancel()
+        activeSession = null
         _uiState.value = CableScanUiState.Scanning
         sessionStarted = false
         pendingQrValue = null
