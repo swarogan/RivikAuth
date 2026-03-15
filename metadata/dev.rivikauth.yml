@@ -1,0 +1,33 @@
+Categories:
+  - Security
+License: MIT
+AuthorName: Swarogan
+AuthorWebSite: https://github.com/swarogan/RivikAuth
+SourceCode: https://github.com/swarogan/RivikAuth
+IssueTracker: https://github.com/swarogan/RivikAuth/issues
+
+AutoName: RivikAuthenticator
+
+RepoType: git
+Repo: https://github.com/swarogan/RivikAuth.git
+
+Builds:
+  - versionName: 0.1.0
+    versionCode: 1
+    commit: master
+    subdir: app
+    gradle:
+      - yes
+    prebuild:
+      - sed -i -e 's|../rivik-fido-sdk|$$rivik-fido-sdk$$|' ../settings.gradle.kts
+    srclibs:
+      - rivik-fido-sdk@master
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 0.1.0
+CurrentVersionCode: 1
+
+AntiFeatures:
+  NonFreeNet:
+    en-US: Connects to cable.ua5v.com (Google tunnel relay) for caBLE hybrid transport. Traffic is end-to-end encrypted.
