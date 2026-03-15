@@ -1,0 +1,15 @@
+RivikAuthenticator turns your Android phone into a FIDO2 security key. It works completely without Google Play Services.
+
+Supported transports:
+* caBLE v2 (QR scan) — scan QR from desktop browser, authenticate via encrypted BLE + WebSocket tunnel
+* NFC — tap phone on USB NFC reader, works like a YubiKey
+* BLE — phone advertises as a standard Bluetooth security key
+
+Features:
+* Full CTAP2 with extensions (credProtect, hmac-secret, largeBlobKey)
+* Credential Provider API support (Android 14+)
+* OTP authenticator (TOTP/HOTP) built-in
+* Encrypted vault with password and biometric unlock
+* No Google dependencies, no tracking, no analytics
+
+Built on rivik-fido-sdk — the only Kotlin/Java caBLE v2 implementation without GMS.

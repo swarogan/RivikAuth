@@ -1,0 +1,7 @@
+Initial release:
+* caBLE v2 hybrid transport (QR scan)
+* NFC transport (HCE)
+* BLE FIDO transport (GATT server)
+* CTAP2.1 extensions: credProtect, hmac-secret, largeBlobKey
+* OTP authenticator (TOTP/HOTP)
+* Encrypted vault with biometric unlock

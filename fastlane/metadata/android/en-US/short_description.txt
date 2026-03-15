@@ -1,0 +1,1 @@
+FIDO2/WebAuthn authenticator without Google Play Services

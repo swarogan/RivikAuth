@@ -1,0 +1,15 @@
+RivikAuthenticator zamienia telefon Android w klucz bezpieczeństwa FIDO2. Działa bez Google Play Services.
+
+Obsługiwane transporty:
+* caBLE v2 (skan QR) — zeskanuj kod z przeglądarki na desktopie, autoryzacja przez szyfrowany tunel BLE + WebSocket
+* NFC — przyłóż telefon do czytnika USB NFC, działa jak YubiKey
+* BLE — telefon rozgłasza się jako standardowy klucz Bluetooth
+
+Funkcje:
+* Pełny CTAP2 z rozszerzeniami (credProtect, hmac-secret, largeBlobKey)
+* Credential Provider API (Android 14+)
+* Wbudowany authenticator OTP (TOTP/HOTP)
+* Szyfrowany vault z hasłem i odciskiem palca
+* Bez zależności od Google, bez trackingu, bez analityki
+
+Zbudowany na rivik-fido-sdk — jedynej implementacji caBLE v2 w Kotlin/Java bez GMS.
